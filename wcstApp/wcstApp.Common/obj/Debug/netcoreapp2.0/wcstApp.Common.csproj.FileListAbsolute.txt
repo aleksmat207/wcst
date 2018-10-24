@@ -1,0 +1,12 @@
+E:\wcst\wcstApp\wcstApp.Common\bin\Debug\netcoreapp2.0\wcstApp.Common.deps.json
+E:\wcst\wcstApp\wcstApp.Common\bin\Debug\netcoreapp2.0\wcstApp.Common.dll
+E:\wcst\wcstApp\wcstApp.Common\bin\Debug\netcoreapp2.0\wcstApp.Common.pdb
+E:\wcst\wcstApp\wcstApp.Common\bin\Debug\netcoreapp2.0\Newtonsoft.Json.dll
+E:\wcst\wcstApp\wcstApp.Common\bin\Debug\netcoreapp2.0\Newtonsoft.Json.xml
+E:\wcst\wcstApp\wcstApp.Common\obj\Debug\netcoreapp2.0\wcstApp.Common.csprojAssemblyReference.cache
+E:\wcst\wcstApp\wcstApp.Common\obj\Debug\netcoreapp2.0\wcstApp.Common.csproj.CoreCompileInputs.cache
+E:\wcst\wcstApp\wcstApp.Common\obj\Debug\netcoreapp2.0\wcstApp.Common.AssemblyInfoInputs.cache
+E:\wcst\wcstApp\wcstApp.Common\obj\Debug\netcoreapp2.0\wcstApp.Common.AssemblyInfo.cs
+E:\wcst\wcstApp\wcstApp.Common\obj\Debug\netcoreapp2.0\wcstApp.Common.csproj.CopyComplete
+E:\wcst\wcstApp\wcstApp.Common\obj\Debug\netcoreapp2.0\wcstApp.Common.dll
+E:\wcst\wcstApp\wcstApp.Common\obj\Debug\netcoreapp2.0\wcstApp.Common.pdb

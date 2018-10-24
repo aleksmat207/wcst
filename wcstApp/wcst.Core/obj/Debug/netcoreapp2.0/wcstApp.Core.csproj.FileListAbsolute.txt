@@ -1,0 +1,14 @@
+E:\wcst\wcstApp\wcst.Core\bin\Debug\netcoreapp2.0\wcstApp.Core.deps.json
+E:\wcst\wcstApp\wcst.Core\bin\Debug\netcoreapp2.0\wcstApp.Core.runtimeconfig.json
+E:\wcst\wcstApp\wcst.Core\bin\Debug\netcoreapp2.0\wcstApp.Core.runtimeconfig.dev.json
+E:\wcst\wcstApp\wcst.Core\bin\Debug\netcoreapp2.0\wcstApp.Core.dll
+E:\wcst\wcstApp\wcst.Core\bin\Debug\netcoreapp2.0\wcstApp.Core.pdb
+E:\wcst\wcstApp\wcst.Core\bin\Debug\netcoreapp2.0\Microsoft.AspNetCore.Hosting.dll
+E:\wcst\wcstApp\wcst.Core\bin\Debug\netcoreapp2.0\Microsoft.AspNetCore.Hosting.xml
+E:\wcst\wcstApp\wcst.Core\obj\Debug\netcoreapp2.0\wcstApp.Core.csproj.CoreCompileInputs.cache
+E:\wcst\wcstApp\wcst.Core\obj\Debug\netcoreapp2.0\wcstApp.Core.AssemblyInfoInputs.cache
+E:\wcst\wcstApp\wcst.Core\obj\Debug\netcoreapp2.0\wcstApp.Core.AssemblyInfo.cs
+E:\wcst\wcstApp\wcst.Core\obj\Debug\netcoreapp2.0\wcstApp.Core.csproj.CopyComplete
+E:\wcst\wcstApp\wcst.Core\obj\Debug\netcoreapp2.0\wcstApp.Core.dll
+E:\wcst\wcstApp\wcst.Core\obj\Debug\netcoreapp2.0\wcstApp.Core.pdb
+E:\wcst\wcstApp\wcst.Core\obj\Debug\netcoreapp2.0\wcstApp.Core.csprojAssemblyReference.cache
