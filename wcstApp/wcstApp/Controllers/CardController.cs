@@ -11,7 +11,6 @@ using Newtonsoft.Json.Linq;
 namespace wcstApp.Controllers
 {
     [Route("api/[controller]")]
-    [Authorize]
     [ExceptionHandler]
     public class CardController : Controller
     {
@@ -26,10 +25,15 @@ namespace wcstApp.Controllers
         {
             return await _cardService.GetStartingCards();
         }
-        [HttpGet, Route("test")]
-        public JContainer PostStartingCards()
+        [HttpGet, Route("send")]
+        public async Task <JContainer> SendStartingCards()
         {
-            return  _cardService.PostStartingCards();
+            return await _cardService.SendStartingCards();
+        }
+        [HttpGet, Route("abc")]
+        public string ABC()
+        {
+            return "abc";
         }
         [HttpGet]
         public async Task <dynamic> GettRandomCards()

@@ -11,6 +11,6 @@ namespace wcstApp.Services.CardService
     {
         Task <dynamic> GetRandomCard();
         Task <dynamic>  GetStartingCards();
-         JContainer PostStartingCards();
+        Task <JContainer> SendStartingCards();
     }
 }
