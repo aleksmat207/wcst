@@ -1,0 +1,16 @@
+E:\wcst\wcstApp\wcstApp\obj\Debug\netcoreapp2.0\wcstApp.csprojResolveAssemblyReference.cache
+E:\wcst\wcstApp\wcstApp\obj\Debug\netcoreapp2.0\wcstApp.csproj.CoreCompileInputs.cache
+E:\wcst\wcstApp\wcstApp\obj\Debug\netcoreapp2.0\wcstApp.AssemblyInfoInputs.cache
+E:\wcst\wcstApp\wcstApp\obj\Debug\netcoreapp2.0\wcstApp.AssemblyInfo.cs
+E:\wcst\wcstApp\wcstApp\bin\Debug\netcoreapp2.0\wcstApp.deps.json
+E:\wcst\wcstApp\wcstApp\bin\Debug\netcoreapp2.0\wcstApp.runtimeconfig.json
+E:\wcst\wcstApp\wcstApp\bin\Debug\netcoreapp2.0\wcstApp.runtimeconfig.dev.json
+E:\wcst\wcstApp\wcstApp\bin\Debug\netcoreapp2.0\wcstApp.dll
+E:\wcst\wcstApp\wcstApp\bin\Debug\netcoreapp2.0\wcstApp.pdb
+E:\wcst\wcstApp\wcstApp\bin\Debug\netcoreapp2.0\wcstApp.Services.dll
+E:\wcst\wcstApp\wcstApp\bin\Debug\netcoreapp2.0\wcstApp.Services.pdb
+E:\wcst\wcstApp\wcstApp\obj\Debug\netcoreapp2.0\wcstApp.csproj.CopyComplete
+E:\wcst\wcstApp\wcstApp\obj\Debug\netcoreapp2.0\wcstApp.dll
+E:\wcst\wcstApp\wcstApp\obj\Debug\netcoreapp2.0\wcstApp.pdb
+E:\wcst\wcstApp\wcstApp\bin\Debug\netcoreapp2.0\wcstApp.Core.dll
+E:\wcst\wcstApp\wcstApp\bin\Debug\netcoreapp2.0\wcstApp.Core.pdb
