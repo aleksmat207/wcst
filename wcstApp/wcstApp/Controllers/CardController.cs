@@ -26,18 +26,22 @@ namespace wcstApp.Controllers
             return await _cardService.GetStartingCards();
         }
         [HttpGet, Route("send")]
-        public async Task <JContainer> SendStartingCards()
+        public async Task <IList<CardModel>> SendStartingCards()
         {
             return await _cardService.SendStartingCards();
+        }
+        [HttpGet, Route("sendrandom")]
+        public async Task<IList<CardModel>> SendRandomCard()
+        {
+            return await _cardService.SendRandomCard();
         }
         [HttpGet, Route("abc")]
         public string ABC()
         {
             return "abc";
         }
-        [HttpGet]
+        [HttpGet, Route("random")]
         public async Task <dynamic> GettRandomCards()
-
         {
             return await _cardService.GetRandomCard();
         }

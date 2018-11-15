@@ -8,6 +8,8 @@ namespace wcstApp.Services.RuleService
 {
     public interface IRuleService
     {
-        Task GetRandomRule();
+        Task <dynamic> GetRandomRule();
+        Task <IList<RuleModel>> SendRandomRule();
+      
     }
 }

@@ -12,7 +12,6 @@ using wcstApp.Services.RuleService;
 namespace wcstApp.API.Controllers
 {
     [Route("api/[controller]")]
-    [Authorize]
     [ExceptionHandler]
     public class RuleController : Controller
     {
@@ -22,11 +21,15 @@ namespace wcstApp.API.Controllers
         {
             _ruleService = ruleService;
         }
-        //[HttpGet]
-
-        //public async Task<JContainer> GetRandomRule()
-        //{
-        //    return await _ruleService.GetRandomRule();
-        //}
+        [HttpGet, Route("random")]
+        public async Task<JContainer> GetRandomRule()
+        {
+            return await _ruleService.GetRandomRule();
+        }
+        [HttpGet] 
+        public async Task<IList<RuleModel>> SendRandomRule()
+        {
+            return await _ruleService.SendRandomRule();
+        }
     }
 }

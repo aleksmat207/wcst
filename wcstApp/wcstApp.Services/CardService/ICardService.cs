@@ -11,6 +11,7 @@ namespace wcstApp.Services.CardService
     {
         Task <dynamic> GetRandomCard();
         Task <dynamic>  GetStartingCards();
-        Task <JContainer> SendStartingCards();
+        Task <IList<CardModel>> SendStartingCards();
+        Task<IList<CardModel>> SendRandomCard();
     }
 }
