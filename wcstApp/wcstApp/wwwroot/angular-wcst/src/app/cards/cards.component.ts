@@ -29,8 +29,9 @@ getStartingCards(){
   )
 }
 decode(){
+    this.imagePath=[]
 this.startingCards.forEach(card => {
-  this.imagePath.push(this.sanitizer.bypassSecurityTrustResourceUrl('data:image/png;base64,' + card.imgbase));
+  this.imagePath.push(this.sanitizer.bypassSecurityTrustUrl('data:image/png;base64,' + card.imgbase));
   console.log(this.imagePath)
 });
 }

@@ -1,0 +1,6 @@
+.borderless td, .borderless th {
+    border: none;
+}
+table {
+    background-color: rgb(229, 242, 247);
+}
