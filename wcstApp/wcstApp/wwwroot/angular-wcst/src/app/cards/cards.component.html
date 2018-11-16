@@ -1,14 +1,15 @@
 
 <h1 style="text-align:center">Test sortowania kard z Wisconsin</h1>
-<button type="button" class="btn btn-secondary btn-lg" (click)="getStartingCards()">
+<button type="button" class="btn btn-secondary btn-lg" (click)="getStartingCards(); getRandomCard()">
 Start
 </button>
 <!-- <img *ngIf="imagePath" [src]="imagePath"/> -->
 <hr>
+<div class="row">
 <div class="col-sm-6">
 <table class="table borderless" >
     <thead>
-      <th *ngFor='let element of imagePath'>
+      <th *ngFor='let element of imagePaths'>
         <tr>
             <td><img *ngIf="element" [src]="element" height="180" width="auto"/></td>
         </tr>
@@ -17,5 +18,5 @@ Start
 </table>
 </div>
 <div class="col-sm-6">
-    
-</div>
+        <img *ngIf="randomImagePath" [src]="randomImagePath" height="180" width="auto"/>
+</div></div>

@@ -12,7 +12,8 @@ export class CardsComponent implements OnInit {
 
 startingCards: Array<CardsModel>=[];
 card:CardsModel;
-imagePath:Array<SafeResourceUrl>=[];
+imagePaths:Array<SafeResourceUrl>=[];
+randomImagePath:SafeResourceUrl;
 decodedCards: Array<string>;
 
   constructor(private cardsService: CardsService, private sanitizer : DomSanitizer) { }
@@ -29,13 +30,20 @@ getStartingCards(){
   )
 }
 decode(){
-    this.imagePath=[]
-this.startingCards.forEach(card => {
-  this.imagePath.push(this.sanitizer.bypassSecurityTrustUrl('data:image/png;base64,' + card.imgbase));
-  console.log(this.imagePath)
+    this.imagePaths=[]
+    this.startingCards.forEach(card => {
+  this.imagePaths.push(this.sanitizer.bypassSecurityTrustUrl('data:image/png;base64,' + card.imgbase));
+  console.log(this.imagePaths)
 });
 }
-
+getRandomCard(){
+    this.cardsService.getRandomCard().subscribe(
+        r=>{
+            this.card=r;
+            this.randomImagePath=this.sanitizer.bypassSecurityTrustUrl('data:image/png;base64,' + r.imgbase);
+        }
+    )
+}
 // dataURItoBlob(binary) {
 //   var array = [];
 //    array.push(binary);
