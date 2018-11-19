@@ -30,7 +30,7 @@ namespace wcstApp.Services.RuleService
         public async Task<dynamic> GetRandomRule()
         {
             Random rand = new Random();
-            int toSkip = rand.Next(0, 2);
+            int toSkip = rand.Next(0, 3);
             WebRequest wr = WebRequest.Create("http://localhost:59308/api/Rule/");
             WebResponse res = wr.GetResponse();
             dynamic rules;

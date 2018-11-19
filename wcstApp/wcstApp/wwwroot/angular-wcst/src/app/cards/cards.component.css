@@ -4,3 +4,15 @@
 table {
     background-color: rgb(229, 242, 247);
 }
+.center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: auto;
+    height: 160px;
+    margin-top: -80px; /* Half the height */
+    margin-left: -80px; /* Half the width */
+}
+.card{
+    background-color: rgb(230, 228, 228);
+}

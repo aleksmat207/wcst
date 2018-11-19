@@ -1,7 +1,10 @@
 
 <h1 style="text-align:center">Test sortowania kard z Wisconsin</h1>
-<button type="button" class="btn btn-secondary btn-lg" (click)="getStartingCards(); getRandomCard()">
+<button type="button" class="btn btn-secondary btn-lg" (click)="getStartingCards(); getRandomCard();">
 Start
+</button>
+<button type="button" class="btn btn-secondary btn-lg" (click)="getRandomRule()">
+rule
 </button>
 <!-- <img *ngIf="imagePath" [src]="imagePath"/> -->
 <hr>
@@ -11,12 +14,13 @@ Start
     <thead>
       <th *ngFor='let element of imagePaths'>
         <tr>
-            <td><img *ngIf="element" [src]="element" height="180" width="auto"/></td>
+            <td><img *ngIf="element" [src]="element" height="160" width="auto"/></td>
         </tr>
       </th>
     </thead>
 </table>
 </div>
-<div class="col-sm-6">
-        <img *ngIf="randomImagePath" [src]="randomImagePath" height="180" width="auto"/>
-</div></div>
+<div class="col-sm-6 card">
+        <img *ngIf="randomImagePath" [src]="randomImagePath" height="180" width="auto" class="center"/>
+</div>
+</div>
