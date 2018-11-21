@@ -1,25 +1,142 @@
+<h1 *ngIf="!isStarted && mobile" class="title" style="text-align:center">
+  Test sortowania kard z Wisconsin
+</h1>
+<h1 *ngIf="!isStarted && !mobile" class="large" style="text-align:center">
+  Test sortowania kard z Wisconsin
+</h1>
+<!-- <a *ngIf="isRuleChecked">{{ rule.name }}</a> -->
+<br />
+<div style="text-align: center;">
+  <button
+    *ngIf="!isStarted"
+    type="button"
+    class="btn btn-secondary btn-lg"
+    (click)="getStartingCards(); getRandomCard()"
+  >
+    Start
+  </button>
+</div>
 
-<h1 style="text-align:center">Test sortowania kard z Wisconsin</h1>
-<a *ngIf="isRuleChecked">{{rule.name}}</a>
-<h3 style="text-align:center">{{result}}</h3>
-<hr>
-<button *ngIf="!isStarted" type="button" class="btn btn-secondary btn-lg" (click)="getStartingCards(); getRandomCard();">
-Start
-</button>
-<!-- <img *ngIf="imagePath" [src]="imagePath"/> -->
-<div class="row">
-  <div class="col-sm-6">
-    <table class="table borderless" >
-      <thead>
-        <th *ngFor='let element of startingCards'>
-         <tr>
-            <td><img *ngIf="element" [src]='element.imgbase' height="160" width="auto" (click)="checkCard(element)"/></td>
-          </tr>
-        </th>
-      </thead>
-    </table>
+<div *ngIf="isStarted && !mobile" class="row">
+  
+  <div id="stopwatch">
+    <div>
+      <div class="marginClass">
+        <span *ngIf="hour > 0" class="large">{{ hour }}</span>
+        <span *ngIf="hour > 0" class="medium">h</span>
+      </div>
+
+      <div class="marginClass">
+        <span *ngIf="minute > 0" class="large">{{ minute }}</span>
+        <span *ngIf="minute > 0" class="medium">m</span>
+      </div>
+
+      <div class="marginClass">
+        <span class="large">{{ second }}</span> <span class="medium">s</span>
+      </div>
+
+      <div class="marginClass">
+        <span class="small" *ngIf="millisecond < 10">0</span>
+        <span class="small">{{ millisecond }}</span>
+      </div>
+    </div>
   </div>
-  <div *ngIf="isStarted" class="col-sm-6 card">
-        <img *ngIf="card" [src]='card.imgbase' height="180" width="auto" class="center"/>
+  <div class="center">
+  <h3 class="large" >{{ result }}</h3>
+</div>
+</div>
+
+<div *ngIf="isStarted && mobile" class="row">
+  <div  id="stopwatchMobile">
+    <div>
+      <div class="marginClass">
+        <span *ngIf="hour > 0" class="largeMobile">{{ hour }}</span>
+        <span *ngIf="hour > 0" class="mediumMobile">h</span>
+      </div>
+
+      <div class="marginClass">
+        <span *ngIf="minute > 0" class="largeMobile">{{ minute }}</span>
+        <span *ngIf="minute > 0" class="mediumMobile">m</span>
+      </div>
+
+      <div class="marginClass">
+        <span class="largeMobile">{{ second }}</span>
+        <span class="mediumMobile">s</span>
+      </div>
+
+      <div class="marginClass">
+        <span class="smallMobile" *ngIf="millisecond < 10">0</span>
+        <span class="smallMobile">{{ millisecond }}</span>
+      </div>
+    </div>
+  </div>  
+  <div class="resultMobile">
+    <h3 class="largeMobile" >{{ result }}</h3>
+ </div>
+</div>
+
+<div
+  *ngIf="!mobile && isStarted"
+  class="startingCards"
+  style="text-align: center;"
+>
+  <table class="table borderless">
+    <thead>
+      <th *ngFor="let element of startingCards">
+        <tr>
+          <td>
+            <img
+              *ngIf="element"
+              [src]="element.imgbase"
+              height="200"
+              width="auto"
+              (click)="checkCard(element)"
+            />
+          </td>
+        </tr>
+      </th>
+    </thead>
+  </table>
+</div>
+
+<div *ngIf="mobile">
+  <table class="table borderless tableMobile">
+    <thead>
+      <th *ngFor="let element of startingCards">
+        <tr>
+          <td>
+            <img
+              *ngIf="element"
+              [src]="element.imgbase"
+              height="90"
+              width="auto"
+              (click)="checkCard(element)"
+            />
+          </td>
+        </tr>
+      </th>
+    </thead>
+  </table>
+</div>
+<div *ngIf="mobile" style="text-align: center;">
+  <div *ngIf="isStarted">
+    <img
+      *ngIf="card"
+      [src]="card.imgbase"
+      height="80"
+      width="auto"
+      class="centerCardMobile"
+    />
+  </div>
+</div>
+<div *ngIf="!mobile" style="text-align: center;">
+  <div *ngIf="isStarted">
+    <img
+      *ngIf="card"
+      [src]="card.imgbase"
+      height="200"
+      width="auto"
+      class="centerCard"
+    />
   </div>
 </div>
