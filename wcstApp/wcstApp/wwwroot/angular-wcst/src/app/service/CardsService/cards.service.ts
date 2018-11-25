@@ -15,7 +15,10 @@ constructor(private http: HttpClient) {}
 getStartingCards(): Observable<Array<CardsModel>>{
     return this.http.get<Array<CardsModel>>(`${environment.apiUrl}/card/start`);
 }
-getRandomCard(): Observable<CardsModel>{
-    return this.http.get<CardsModel>(`${environment.apiUrl}/card/random`);
+// getRandomCard(): Observable<CardsModel>{
+//     return this.http.get<CardsModel>(`${environment.apiUrl}/card/random`);
+// }
+getDeck(): Observable<Array<CardsModel>>{
+    return this.http.get<Array<CardsModel>>(`${environment.apiUrl}/card/random`);
 }
 }

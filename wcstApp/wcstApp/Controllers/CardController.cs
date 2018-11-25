@@ -35,15 +35,10 @@ namespace wcstApp.Controllers
         {
             return await _cardService.SendRandomCard();
         }
-        [HttpGet, Route("abc")]
-        public string ABC()
-        {
-            return "abc";
-        }
         [HttpGet, Route("random")]
-        public async Task <dynamic> GettRandomCards()
+        public async Task <dynamic> GetDeck()
         {
-            return await _cardService.GetRandomCard();
+            return await _cardService.GetDeck();
         }
     }
 }

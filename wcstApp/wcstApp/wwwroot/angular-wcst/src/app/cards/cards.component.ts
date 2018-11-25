@@ -17,6 +17,8 @@ import { timeInterval, pluck, take } from "rxjs/operators";
 export class CardsComponent implements OnInit {
   startingCards: Array<CardsModel> = [];
   card: CardsModel;
+  cards: Array<CardsModel>=[];
+
   previousCard: CardsModel;
   imagePaths: Array<SafeResourceUrl> = [];
   randomImagePath: SafeResourceUrl;
@@ -24,11 +26,15 @@ export class CardsComponent implements OnInit {
   decodedCards: Array<string>;
   rule: RuleModel;
   ruleCounter: number;
-  mistakeCounter: number;
   result: string;
   isStarted: boolean;
   previousRule: RuleModel = { name };
   mobile:boolean=false;
+  ruleName:string;
+  //scoring
+  errors: number;
+  responses:number;
+  completedCategories:number;
   //stopwatch:
   x: number;
   intervalId;
@@ -47,9 +53,12 @@ export class CardsComponent implements OnInit {
       if(window.screen.width<1024){
           this.mobile=true;
       }
-    this.mistakeCounter = 0;
+    this.errors = 0;
     this.ruleCounter = 0;
-    this.getRandomRule();
+    this.responses=0;
+    this.completedCategories=0;
+    this.ruleName="color";
+    this.getDeck();
   }
 
   getStartingCards() {
@@ -59,6 +68,7 @@ export class CardsComponent implements OnInit {
       // console.log(this.startingCards)
       //  this.decode()
       this.onStartStopwatch()
+      
     });
   }
 
@@ -68,47 +78,57 @@ export class CardsComponent implements OnInit {
   //   this.imagePaths.push(this.sanitizer.bypassSecurityTrustUrl('data:image/png;base64,' + card.imgbase));
   // });
   // }
-  getRandomCard() {
-    this.cardsService.getRandomCard().subscribe(r => {
-      this.card = r;
-      this.isCardRepeated();
+  getDeck() {
+    this.cardsService.getDeck().subscribe(r => {
+// this.card=r;     
+        this.cards = r;
+     // this.isCardRepeated();
       //this.randomImagePath=this.sanitizer.bypassSecurityTrustUrl('data:image/png;base64,' + r.imgbase);
     });
+  }
+  getRandomCard(){
+    this.card= this.cards.pop();
   }
   checkCard(element) {
     console.log(element);
 
-    switch (this.rule.name) {
+    switch (this.ruleName) {
       case "color":
         if (element.color == this.card.color) {
           this.ruleCounter = this.ruleCounter + 1;
+          this.responses=this.responses+1;
           console.log("DOBRZE! ruleCounter:", this.ruleCounter);
           this.result = "Dobrze!";
         } else {
-          this.mistakeCounter++;
-          console.log("ZLE! mistakeCounter:", this.mistakeCounter);
+          this.errors++;
+          this.ruleCounter=0;
+          console.log("ZLE! mistakeCounter:", this.errors);
           this.result = "Źle!";
         }
         break;
-      case "sign":
-        if (element.sign == this.card.sign) {
+      case "form":
+        if (element.form == this.card.form) {
           this.ruleCounter = this.ruleCounter + 1;
+          this.responses=this.responses+1;
           console.log("DOBRZE! ruleCounter:", this.ruleCounter);
           this.result = "Dobrze!";
         } else {
-          this.mistakeCounter++;
-          console.log("ZLE! mistakeCounter:", this.mistakeCounter);
+          this.errors++;
+          this.ruleCounter=0;
+          console.log("ZLE! mistakeCounter:", this.errors);
           this.result = "Źle!";
         }
         break;
-      case "amount":
-        if (element.amount == this.card.amount) {
+      case "number":
+        if (element.number == this.card.number) {
           this.ruleCounter = this.ruleCounter + 1;
+          this.responses=this.responses+1;
           console.log("DOBRZE! ruleCounter:", this.ruleCounter);
           this.result = "Dobrze!";
         } else {
-          this.mistakeCounter++;
-          console.log("ZLE! mistakeCounter:", this.mistakeCounter);
+          this.errors++;
+          this.ruleCounter=0;
+          console.log("ZLE! mistakeCounter:", this.errors);
           this.result = "Źle!";
         }
         break;
@@ -116,6 +136,7 @@ export class CardsComponent implements OnInit {
     this.getRandomCard();
     if (this.ruleCounter == 10) {
       this.ruleCounter = 0;
+      this.completedCategories=this.completedCategories+1;
       console.log("ZMIANA REGUŁY! ruleCounter:", this.ruleCounter);
       this.getRandomRule();
     }
@@ -124,17 +145,28 @@ export class CardsComponent implements OnInit {
     if (JSON.stringify(this.card) === JSON.stringify(this.previousCard)) {
       console.log("KARTY SIE POWTORZYLY!!!!");
 
-      this.getRandomCard();
+      this.getDeck();
     } else {
       this.previousCard = this.card;
     }
   }
   getRandomRule() {
-    this.ruleService.getRandomRule().subscribe(r => {
-      this.rule = r;
-      this.isRuleRepeated();
-      this.isRuleChecked = true;
-    });
+    // this.ruleService.getRandomRule().subscribe(r => {
+    //   this.rule = r;
+    //   this.isRuleRepeated();
+    //   this.isRuleChecked = true;
+    // });
+    switch (this.ruleName) {
+        case "color":
+        this.ruleName="form";
+        break;
+        case "form":
+        this.ruleName="number";
+        break;
+        case "number":
+        this.ruleName="color";
+        break;
+    }
   }
   isRuleRepeated() {
     if (

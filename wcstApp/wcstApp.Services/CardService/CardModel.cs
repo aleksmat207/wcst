@@ -8,7 +8,7 @@ namespace wcstApp.Services.CardService
      {
         public string Imgbase { get; set; }
         public string Color { get; set; }
-        public int Amount { get; set; }
-        public string Sign { get; set; }
+        public int Number { get; set; }
+        public string Form { get; set; }
     }
 }

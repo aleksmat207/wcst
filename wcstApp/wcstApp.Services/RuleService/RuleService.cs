@@ -22,8 +22,8 @@ namespace wcstApp.Services.RuleService
             IList<RuleModel> result = new List<RuleModel>()
             {
                 new RuleModel() {Name= "color"},
-                new RuleModel() {Name= "amount"},
-                new RuleModel() {Name= "sign"}
+                new RuleModel() {Name= "number"},
+                new RuleModel() {Name= "form"}
               };
             return result;
         }
@@ -38,7 +38,6 @@ namespace wcstApp.Services.RuleService
             {
                 string json = reader.ReadToEnd();
                 rules = JsonConvert.DeserializeObject(json);
-                //  this.pictureBox1.Load(images["0"].imglink.Value);
             }
             return rules[toSkip];
 
