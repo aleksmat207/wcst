@@ -4,6 +4,21 @@
 <h1 *ngIf="!isStarted && !mobile" class="large" style="text-align:center">
   Test sortowania kard z Wisconsin
 </h1>
+<h1 *ngIf="isTestEnded" class="large" style="text-align:center">
+  Koniec badania
+</h1>
+<h1 *ngIf="isTestEnded" class="large" style="text-align:center">
+  {{time}}
+</h1>
+<div style="text-align: center;">
+  <button
+    *ngIf="isTestEnded"
+    type="button"
+    class="btn btn-secondary btn-lg"
+  >
+    Zobacz wyniki badania
+  </button>
+</div>
 <!-- <a *ngIf="isRuleChecked">{{ rule.name }}</a> -->
 <br />
 <div style="text-align: center;">
@@ -17,9 +32,9 @@
   </button>
 </div>
 
-<div *ngIf="isStarted && !mobile" class="row">
+<div *ngIf="isStarted && !mobile && !isTestEnded" class="row">
   
-  <div id="stopwatch">
+  <!-- <div id="stopwatch">
     <div>
       <div class="marginClass">
         <span *ngIf="hour > 0" class="large">{{ hour }}</span>
@@ -40,14 +55,14 @@
         <span class="small">{{ millisecond }}</span>
       </div>
     </div>
-  </div>
+  </div> -->
   <div class="center">
   <h3 class="large" >{{ result }}</h3>
 </div>
 </div>
 
-<div *ngIf="isStarted && mobile" class="row">
-  <div  id="stopwatchMobile">
+<div *ngIf="isStarted && mobile  && !isTestEnded" class="row">
+  <!-- <div  id="stopwatchMobile">
     <div>
       <div class="marginClass">
         <span *ngIf="hour > 0" class="largeMobile">{{ hour }}</span>
@@ -69,14 +84,14 @@
         <span class="smallMobile">{{ millisecond }}</span>
       </div>
     </div>
-  </div>  
-  <div class="resultMobile">
+  </div>   -->
+  <div class="resultMobile  && !isTestEnded">
     <h3 class="largeMobile" >{{ result }}</h3>
  </div>
 </div>
 
 <div
-  *ngIf="!mobile && isStarted"
+  *ngIf="!mobile && isStarted  && !isTestEnded"
   class="startingCards"
   style="text-align: center;"
 >
@@ -99,7 +114,7 @@
   </table>
 </div>
 
-<div *ngIf="mobile">
+<div *ngIf="mobile  && !isTestEnded">
   <table class="table borderless tableMobile">
     <thead>
       <th *ngFor="let element of startingCards">
@@ -118,7 +133,7 @@
     </thead>
   </table>
 </div>
-<div *ngIf="mobile" style="text-align: center;">
+<div *ngIf="mobile  && !isTestEnded" style="text-align: center;">
   <div *ngIf="isStarted">
     <img
       *ngIf="card"
@@ -129,7 +144,7 @@
     />
   </div>
 </div>
-<div *ngIf="!mobile" style="text-align: center;">
+<div *ngIf="!mobile  && !isTestEnded" style="text-align: center;">
   <div *ngIf="isStarted">
     <img
       *ngIf="card"
