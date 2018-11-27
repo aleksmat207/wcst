@@ -6,7 +6,10 @@ import { RuleService } from "../service/RuleService/rule.service";
 import { RuleModel } from "../service/RuleService/rule.model";
 import { timer } from "rxjs";
 import { timeInterval, pluck, take } from "rxjs/operators";
-
+import pdfMake from "pdfmake/build/pdfmake";
+import pdfFonts from "pdfmake/build/vfs_fonts";
+import { formatDate } from "@angular/common";
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
 @Component({
   selector: "app-cards",
   templateUrl: "./cards.component.html",
@@ -16,14 +19,14 @@ export class CardsComponent implements OnInit {
   startingCards: Array<CardsModel> = [];
   card: CardsModel;
   deck: Array<CardsModel> = [];
-
+temp:number=0;
   //   previousCard: CardsModel;
   //   imagePaths: Array<SafeResourceUrl> = [];
   //  randomImagePath: SafeResourceUrl;
   //  previousRule: RuleModel = { name };
   //  decodedCards: Array<string>;
   //  rule: RuleModel;
-  
+
   previousErrorRule: string;
   ruleCounter: number;
   result: string;
@@ -33,6 +36,8 @@ export class CardsComponent implements OnInit {
   mobile: boolean = false;
   ruleName: string;
   //scoring
+  startDate: string;
+
   trial: number;
   errors: number;
   responses: number;
@@ -47,7 +52,7 @@ export class CardsComponent implements OnInit {
   trialsToFirstCategory: number;
   series: number;
 
-  conceptualLevelResonse: number;
+  conceptualLevelResponse: number;
   learningToLearn: number;
   //stopwatch:
 
@@ -68,7 +73,7 @@ export class CardsComponent implements OnInit {
     if (window.screen.width < 1024) {
       this.mobile = true;
     }
-    this.trial = 1;
+    this.trial = 0;
     this.errors = 0;
     this.ruleCounter = 0;
     this.responses = 0;
@@ -78,7 +83,7 @@ export class CardsComponent implements OnInit {
     this.perservativeResponses = 0;
     this.trialsToFirstCategory = 0;
     this.series = 0;
-    this.conceptualLevelResonse = 0;
+    this.conceptualLevelResponse = 0;
     this.failureToSet = 0;
     this.previousErrorRule = "";
     this.ruleName = "color";
@@ -91,6 +96,8 @@ export class CardsComponent implements OnInit {
       // console.log(this.startingCards)
       //  this.decode()
       this.onStartStopwatch();
+      let date = new Date();
+      this.startDate = formatDate(date, "medium", "pl");
     });
   }
   // decode(){
@@ -99,6 +106,36 @@ export class CardsComponent implements OnInit {
   //   this.imagePaths.push(this.sanitizer.bypassSecurityTrustUrl('data:image/png;base64,' + card.imgbase));
   // });
   // }
+  makePdf() {
+    let date = new Date();
+    this.startDate = formatDate(date, "shortDate", "pl");
+    var docDefinition = {
+      content: [
+        {  text: "Test sortowania kard z Wisconsin ", fontSize: 22 },
+        " ",
+        { text: "Data: " + this.startDate, fontSize: 22 },
+        " ",
+        "Czas trwania badania: " + this.time,
+        "Ilość prób: "+ this.trial,
+        "Ilość odpowiedzi: " + this.responses,
+        "Ilość błędów: " + this.errors,
+        "Ilość błędów perseweracyjnych: " + this.perservativeErrors,
+        "Ilość błędów nieperseweracyjnych: " + this.nonPerservativeErrors,
+        "Ilość odpowiedzi perseweracyjnych: " + this.perservativeResponses,
+        "Procent odpowiedzi: " + this.percentageOfResponses,
+        "Procent błędów perseweracyjnych: " + this.percentageOfPerservativeErrors.toFixed(2),
+        "Ilość ukończonych kategorii: " + this.completedCategories,
+        "Ilość prób do ukończenia pierwszej kategorii: " +
+          this.trialsToFirstCategory,
+         "Conceptual Level Response: " + this.conceptualLevelResponse,
+"Brak utrzymania zestawu: " + this.failureToSet,
+        
+      ]
+    };
+    
+    pdfMake.createPdf(docDefinition).download("WCST");
+    pdfMake.createPdf(docDefinition).open();
+  }
   getDeck() {
     this.cardsService.getDeck().subscribe(r => {
       // this.card=r;
@@ -108,13 +145,20 @@ export class CardsComponent implements OnInit {
     });
   }
   getRandomCard() {
-    if (this.deck.pop()) this.card = this.deck.pop();
+    if (this.deck.length>0) {this.card = this.deck.pop();
+    this.temp++;
+console.log("tslia", this.deck.length)
+    }
     else {
       this.isTestEnded = true;
       this.pause = true;
       clearInterval(this.intervalId);
-      this.time = this.hour + "h " + this.minute + "m " + this.second + "s";
+      if (this.hour > 0)
+        this.time = this.hour + "h " + this.minute + "m " + this.second + "s";
+      else this.time = this.minute + "m " + this.second + "s";
+
       console.log("KONIEC!!!!!!");
+      this.calculateTrialsToFirstCategory();
       this.makeScoring();
     }
   }
@@ -225,7 +269,10 @@ export class CardsComponent implements OnInit {
         this.isTestEnded = true;
         this.pause = true;
         clearInterval(this.intervalId);
-        this.time = this.hour + "h " + this.minute + "m " + this.second + "s";
+        if (this.hour > 0)
+          this.time = this.hour + "h " + this.minute + "m " + this.second + "s";
+        else this.time = this.minute + "m " + this.second + "s";
+
         this.makeScoring();
       }
       console.log("ZMIANA REGUŁY! ruleCounter:", this.ruleCounter);
@@ -233,7 +280,7 @@ export class CardsComponent implements OnInit {
     }
   }
   calculateTrialsToFirstCategory() {
-    if (this.completedCategories < 1) {
+    if (this.completedCategories < 1 && !this.isTestEnded) {
       this.trialsToFirstCategory++;
     }
     if (this.isTestEnded && this.completedCategories == 0) {
@@ -248,9 +295,9 @@ export class CardsComponent implements OnInit {
   calculateConceptualLevelResponse() {
     this.series++;
     if (this.series == 3) {
-      this.conceptualLevelResonse = this.conceptualLevelResonse + 3;
+      this.conceptualLevelResponse = this.conceptualLevelResponse + 3;
     } else if (this.series > 3) {
-      this.conceptualLevelResonse++;
+      this.conceptualLevelResponse++;
     }
     //ToDo
   }
@@ -273,7 +320,10 @@ export class CardsComponent implements OnInit {
   }
   makeScoring() {
     this.percentageOfPerservativeErrors = this.perservativeErrors / this.errors;
+ this.percentageOfPerservativeErrors.toFixed(2)
     this.percentageOfResponses = this.responses / this.trial;
+ this.percentageOfResponses.toFixed(2)
+
   }
   //   isCardRepeated() {
   //     if (JSON.stringify(this.card) === JSON.stringify(this.previousCard)) {
@@ -334,11 +384,4 @@ export class CardsComponent implements OnInit {
       this.hour++;
     }
   }
-  // dataURItoBlob(binary) {
-  //   var array = [];
-  //    array.push(binary);
-  // return new Blob([new Uint8Array(array)], {
-  //   type: 'image/png'
-  // });
-  // }
 }
