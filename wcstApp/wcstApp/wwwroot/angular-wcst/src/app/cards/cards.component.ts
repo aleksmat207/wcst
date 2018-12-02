@@ -5,10 +5,11 @@ import { CardsService } from "../service/CardsService/cards.service";
 import { RuleService } from "../service/RuleService/rule.service";
 import { RuleModel } from "../service/RuleService/rule.model";
 import { timer } from "rxjs";
-import { timeInterval, pluck, take } from "rxjs/operators";
+import { timeInterval, pluck, take, windowWhen } from "rxjs/operators";
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 import { formatDate } from "@angular/common";
+import { ScoreModel } from "../service/CardsService/score.model";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 @Component({
   selector: "app-cards",
@@ -19,7 +20,7 @@ export class CardsComponent implements OnInit {
   startingCards: Array<CardsModel> = [];
   card: CardsModel;
   deck: Array<CardsModel> = [];
-temp:number=0;
+  temp: number = 0;
   //   previousCard: CardsModel;
   //   imagePaths: Array<SafeResourceUrl> = [];
   //  randomImagePath: SafeResourceUrl;
@@ -36,9 +37,11 @@ temp:number=0;
   mobile: boolean = false;
   ruleName: string;
   //scoring
+  score: Array<ScoreModel> = [];
+  scoreModel: ScoreModel;
   startDate: string;
 
-  trial: number;
+  trials: number;
   errors: number;
   responses: number;
   completedCategories: number;
@@ -72,8 +75,13 @@ temp:number=0;
   ngOnInit() {
     if (window.screen.width < 1024) {
       this.mobile = true;
+      window.screen.orientation.lock("portrait").catch(function(error) {
+        // whatever
+        console.log("mie mozna wyświetlić ");
+      });
     }
-    this.trial = 0;
+
+    this.trials = 0;
     this.errors = 0;
     this.ruleCounter = 0;
     this.responses = 0;
@@ -111,30 +119,29 @@ temp:number=0;
     this.startDate = formatDate(date, "shortDate", "pl");
     var docDefinition = {
       content: [
-        {  text: "Test sortowania kard z Wisconsin ", fontSize: 22 },
+        { text: "Test sortowania kard z Wisconsin ", fontSize: 22 },
         " ",
         { text: "Data: " + this.startDate, fontSize: 22 },
         " ",
         "Czas trwania badania: " + this.time,
-        "Ilość prób: "+ this.trial,
+        "Ilość prób: " + this.trials,
         "Ilość odpowiedzi: " + this.responses,
         "Ilość błędów: " + this.errors,
         "Ilość błędów perseweracyjnych: " + this.perservativeErrors,
         "Ilość błędów nieperseweracyjnych: " + this.nonPerservativeErrors,
         "Ilość odpowiedzi perseweracyjnych: " + this.perservativeResponses,
         "Procent odpowiedzi: " + this.percentageOfResponses,
-        "Procent błędów perseweracyjnych: " + this.percentageOfPerservativeErrors.toFixed(2),
+        "Procent błędów perseweracyjnych: " +
+          this.percentageOfPerservativeErrors.toFixed(2),
         "Ilość ukończonych kategorii: " + this.completedCategories,
         "Ilość prób do ukończenia pierwszej kategorii: " +
           this.trialsToFirstCategory,
-         "Conceptual Level Response: " + this.conceptualLevelResponse,
-"Brak utrzymania zestawu: " + this.failureToSet,
-        
+        "Conceptual Level Response: " + this.conceptualLevelResponse,
+        "Brak utrzymania zestawu: " + this.failureToSet
       ]
     };
-    
-    pdfMake.createPdf(docDefinition).download("WCST");
     pdfMake.createPdf(docDefinition).open();
+    pdfMake.createPdf(docDefinition).download("WCST");
   }
   getDeck() {
     this.cardsService.getDeck().subscribe(r => {
@@ -145,11 +152,11 @@ temp:number=0;
     });
   }
   getRandomCard() {
-    if (this.deck.length>0) {this.card = this.deck.pop();
-    this.temp++;
-console.log("tslia", this.deck.length)
-    }
-    else {
+    if (this.deck.length > 0) {
+      this.card = this.deck.pop();
+      this.temp++;
+      console.log("tslia", this.deck.length);
+    } else {
       this.isTestEnded = true;
       this.pause = true;
       clearInterval(this.intervalId);
@@ -163,14 +170,18 @@ console.log("tslia", this.deck.length)
     }
   }
   checkCard(element) {
-    console.log(element);
-
+    console.log(element.imgbase);
+    console.log(this.scoreModel.selectedCard);
+    this.scoreModel.selectedCard = element.imgbase;
+    console.log(this.scoreModel.selectedCard);
+    this.scoreModel.sortedCard = this.card.imgbase;
     switch (this.ruleName) {
       case "color":
+        this.scoreModel.correctRule = "Kolor";
         if (element.color == this.card.color) {
           this.ruleCounter++;
           this.responses++;
-          this.trial++;
+          this.trials++;
           console.log("DOBRZE! ruleCounter:", this.ruleCounter);
           this.result = "Dobrze!";
           this.calculateTrialsToFirstCategory();
@@ -180,7 +191,7 @@ console.log("tslia", this.deck.length)
           this.calculateFailureToSet();
           this.ruleCounter = 0;
           this.series = 0;
-          this.trial++;
+          this.trials++;
           console.log("ZLE! mistakeCounter:", this.errors);
           this.result = "Źle!";
           this.calculateTrialsToFirstCategory();
@@ -200,10 +211,11 @@ console.log("tslia", this.deck.length)
         }
         break;
       case "form":
+        this.scoreModel.correctRule = "Kształt";
         if (element.form == this.card.form) {
           this.ruleCounter++;
           this.responses++;
-          this.trial++;
+          this.trials++;
           console.log("DOBRZE! ruleCounter:", this.ruleCounter);
           this.result = "Dobrze!";
           this.calculateTrialsToFirstCategory();
@@ -213,7 +225,7 @@ console.log("tslia", this.deck.length)
           this.calculateFailureToSet();
           this.ruleCounter = 0;
           this.series = 0;
-          this.trial++;
+          this.trials++;
           console.log("ZLE! mistakeCounter:", this.errors);
           this.result = "Źle!";
           this.calculateTrialsToFirstCategory();
@@ -232,10 +244,11 @@ console.log("tslia", this.deck.length)
         }
         break;
       case "number":
+        this.scoreModel.correctRule = "Liczba";
         if (element.number == this.card.number) {
           this.ruleCounter++;
           this.responses++;
-          this.trial++;
+          this.trials++;
           console.log("DOBRZE! ruleCounter:", this.ruleCounter);
           this.calculateTrialsToFirstCategory();
           this.calculateConceptualLevelResponse();
@@ -245,7 +258,7 @@ console.log("tslia", this.deck.length)
           this.calculateFailureToSet();
           this.ruleCounter = 0;
           this.series = 0;
-          this.trial++;
+          this.trials++;
           console.log("ZLE! mistakeCounter:", this.errors);
           this.result = "Źle!";
           this.calculateTrialsToFirstCategory();
@@ -261,6 +274,9 @@ console.log("tslia", this.deck.length)
         }
         break;
     }
+    this.scoreModel.feedback = this.result;
+    this.scoreModel.trial = this.trials;
+    this.scoreModel.sequenceCorrect = this.ruleCounter;
     this.getRandomCard();
     if (this.ruleCounter == 10) {
       this.ruleCounter = 0;
@@ -277,6 +293,8 @@ console.log("tslia", this.deck.length)
       }
       console.log("ZMIANA REGUŁY! ruleCounter:", this.ruleCounter);
       this.getRandomRule();
+
+      // this.score.push(this.scoreModel);
     }
   }
   calculateTrialsToFirstCategory() {
@@ -320,10 +338,9 @@ console.log("tslia", this.deck.length)
   }
   makeScoring() {
     this.percentageOfPerservativeErrors = this.perservativeErrors / this.errors;
- this.percentageOfPerservativeErrors.toFixed(2)
-    this.percentageOfResponses = this.responses / this.trial;
- this.percentageOfResponses.toFixed(2)
-
+    this.percentageOfPerservativeErrors.toFixed(2);
+    this.percentageOfResponses = this.responses / this.trials;
+    this.percentageOfResponses.toFixed(2);
   }
   //   isCardRepeated() {
   //     if (JSON.stringify(this.card) === JSON.stringify(this.previousCard)) {

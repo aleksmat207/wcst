@@ -1,15 +1,48 @@
-<h1 *ngIf="!isStarted && mobile" class="title" style="text-align:center">
-  Test sortowania kard z Wisconsin
-</h1>
 <h1 *ngIf="!isStarted && !mobile" class="large" style="text-align:center">
   Test sortowania kard z Wisconsin
 </h1>
-<h1 *ngIf="isTestEnded" class="large" style="text-align:center">
-  Koniec badania
+<h1  *ngIf="!isStarted && mobile" class="largeMobile" style="text-align:center">
+  Test sortowania kard z Wisconsin
 </h1>
-<h1 *ngIf="isTestEnded" class="large" style="text-align:center">
+<h1 *ngIf="isTestEnded && !mobile " class="large" style="text-align:center">
+  Badanie zostało zakończone
+</h1>
+<h1 *ngIf="isTestEnded && mobile" class="largeMobile" style="text-align:center">
+  Badanie zostało zakończone
+</h1>
+<table *ngIf="isTestEnded" class="table table-bordered">
+  <thead>
+      <tr>
+        <th scope="col">Próba
+        </th>
+        <th scope="col">Prawidłowa reguła
+        </th>
+        <th scope="col">Dopasowana karta
+        </th>
+        <th scope="col">Zastosowana reguła
+        </th>
+        <th scope="col">Licznik
+        </th>
+        <th scope="col">Wynik
+        </th>
+        <th scope="col">Punktacja
+        </th>
+    </tr>
+  </thead>
+  <tbody>
+<tr *ngFor="let element of score"></tr>
+<td>{{element.trial}}</td>
+<td>{{element.correctRule}}</td>
+<td></td>
+<td>{{element.appliedRule}}</td>
+<td>{{element.sequenceCorrect}}</td>
+<td>{{element.feedback}}</td>
+<td>{{element.comment}}</td>
+  </tbody>
+</table>
+<!-- <h1 *ngIf="isTestEnded" class="large" style="text-align:center">
   {{time}}
-</h1>
+</h1> -->
 <div style="text-align: center;">
   <button
     *ngIf="isTestEnded"
@@ -33,8 +66,72 @@
   </button>
 </div>
 
+<!-- Mobile -->
+
+
+<div *ngIf="isStarted &&  mobile  && !isTestEnded" class="row">
+  <!-- <div  id="stopwatchMobile">
+    <div>
+      <div class="marginClass">
+        <span *ngIf="hour > 0" class="largeMobile">{{ hour }}</span>
+        <span *ngIf="hour > 0" class="mediumMobile">h</span>
+      </div>
+
+      <div class="marginClass">
+        <span *ngIf="minute > 0" class="largeMobile">{{ minute }}</span>
+        <span *ngIf="minute > 0" class="mediumMobile">m</span>
+      </div>
+
+      <div class="marginClass">
+        <span class="largeMobile">{{ second }}</span>
+        <span class="mediumMobile">s</span>
+      </div>
+
+      <div class="marginClass">
+        <span class="smallMobile" *ngIf="millisecond < 10">0</span>
+        <span class="smallMobile">{{ millisecond }}</span>
+      </div>
+    </div>
+  </div>   -->
+   <div class="centerMobile">
+    <h3 class="largeMobile " >{{ result }}</h3>
+ </div>
+</div>
+<div *ngIf="mobile && !isTestEnded">
+  <table class="table borderless tableMobile">
+    <thead>
+      <th *ngFor="let element of startingCards">
+        <tr>
+          <td>
+            <img
+              *ngIf="element"
+              [src]="element.imgbase"
+              height="auto"
+              width="100%"
+              (click)="checkCard(element)"
+            />
+          </td>
+        </tr>
+      </th>
+    </thead>
+  </table>
+</div>
+
+<div  *ngIf="mobile  && !isTestEnded" >
+  <div *ngIf="isStarted">
+    <img
+      *ngIf="card"
+      [src]="card.imgbase"
+      class="centerCardMobile"
+    />
+  </div>
+</div>
+
+<!-- !Mobile -->
+
+
+
 <div *ngIf="isStarted && !mobile && !isTestEnded" class="row">
-  
   <!-- <div id="stopwatch">
     <div>
       <div class="marginClass">
@@ -61,36 +158,6 @@
   <h3 class="large" >{{ result }}</h3>
 </div>
 </div>
-
-<div *ngIf="isStarted && mobile  && !isTestEnded" class="row">
-  <!-- <div  id="stopwatchMobile">
-    <div>
-      <div class="marginClass">
-        <span *ngIf="hour > 0" class="largeMobile">{{ hour }}</span>
-        <span *ngIf="hour > 0" class="mediumMobile">h</span>
-      </div>
-
-      <div class="marginClass">
-        <span *ngIf="minute > 0" class="largeMobile">{{ minute }}</span>
-        <span *ngIf="minute > 0" class="mediumMobile">m</span>
-      </div>
-
-      <div class="marginClass">
-        <span class="largeMobile">{{ second }}</span>
-        <span class="mediumMobile">s</span>
-      </div>
-
-      <div class="marginClass">
-        <span class="smallMobile" *ngIf="millisecond < 10">0</span>
-        <span class="smallMobile">{{ millisecond }}</span>
-      </div>
-    </div>
-  </div>   -->
-  <div class="resultMobile  && !isTestEnded">
-    <h3 class="largeMobile" >{{ result }}</h3>
- </div>
-</div>
-
 <div
   *ngIf="!mobile && isStarted  && !isTestEnded"
   class="startingCards"
@@ -113,37 +180,6 @@
       </th>
     </thead>
   </table>
-</div>
-
-<div *ngIf="mobile  && !isTestEnded">
-  <table class="table borderless tableMobile">
-    <thead>
-      <th *ngFor="let element of startingCards">
-        <tr>
-          <td>
-            <img
-              *ngIf="element"
-              [src]="element.imgbase"
-              height="90"
-              width="auto"
-              (click)="checkCard(element)"
-            />
-          </td>
-        </tr>
-      </th>
-    </thead>
-  </table>
-</div>
-<div *ngIf="mobile  && !isTestEnded" style="text-align: center;">
-  <div *ngIf="isStarted">
-    <img
-      *ngIf="card"
-      [src]="card.imgbase"
-      height="80"
-      width="auto"
-      class="centerCardMobile"
-    />
-  </div>
 </div>
 <div *ngIf="!mobile  && !isTestEnded" style="text-align: center;">
   <div *ngIf="isStarted">
