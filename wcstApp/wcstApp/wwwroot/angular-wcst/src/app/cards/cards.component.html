@@ -10,39 +10,6 @@
 <h1 *ngIf="isTestEnded && mobile" class="largeMobile" style="text-align:center">
   Badanie zostało zakończone
 </h1>
-<table *ngIf="isTestEnded" class="table table-bordered">
-  <thead>
-      <tr>
-        <th scope="col">Próba
-        </th>
-        <th scope="col">Prawidłowa reguła
-        </th>
-        <th scope="col">Dopasowana karta
-        </th>
-        <th scope="col">Zastosowana reguła
-        </th>
-        <th scope="col">Licznik
-        </th>
-        <th scope="col">Wynik
-        </th>
-        <th scope="col">Punktacja
-        </th>
-    </tr>
-  </thead>
-  <tbody>
-<tr *ngFor="let element of score"></tr>
-<td>{{element.trial}}</td>
-<td>{{element.correctRule}}</td>
-<td></td>
-<td>{{element.appliedRule}}</td>
-<td>{{element.sequenceCorrect}}</td>
-<td>{{element.feedback}}</td>
-<td>{{element.comment}}</td>
-  </tbody>
-</table>
-<!-- <h1 *ngIf="isTestEnded" class="large" style="text-align:center">
-  {{time}}
-</h1> -->
 <div style="text-align: center;">
   <button
     *ngIf="isTestEnded"
@@ -50,9 +17,73 @@
     class="btn btn-secondary btn-lg"
     (click)="makePdf()"
   >
-    Zobacz wyniki badania
+    Pobierz wyniki badania
   </button>
 </div>
+<br>
+<div style="text-align: center;">
+  <button
+    *ngIf="isTestEnded"
+    type="button"
+    class="btn btn-secondary btn-lg"
+    (click)="newTest()"
+  >
+   Rozpocznij nowe badanie
+  </button>
+</div>
+<br>
+<div id="exportthis">
+<table *ngIf="isTestEnded" class="table table-bordered score">
+  <thead>
+      <tr>
+        <th scope="col">Próba
+        </th>
+        <th scope="col">Prawidłowa reguła
+        </th>
+        <th scope="col">Wybrana karta
+        </th>
+        <th scope="col">Sortowana karta
+        </th>
+        <th scope="col">Zastosowana reguła
+        </th>
+        <th scope="col">Licznik
+        </th>
+        <th scope="col">Wynik
+        </th>
+        <th scope="col">Opis
+        </th>
+    </tr>
+  </thead>
+  <tbody>
+<tr *ngFor="let element of score">
+<td>{{element.trial}}</td>
+<td>{{element.correctRule}}</td>
+<td>
+    <img
+    [src]="element.selectedCard"
+    height="auto"
+    width="50"
+ class="scoreTable"
+  /></td>
+  <td>
+    <img
+    [src]="element.sortedCard"
+    height="auto"
+    width="50"
+ class="scoreTable"
+  />
+  </td>
+<td>{{element.appliedRule}}</td>
+<td>{{element.sequenceCorrect}}</td>
+<td>{{element.feedback}}</td>
+<td>{{element.comment}}</td></tr>
+  </tbody>
+</table>
+</div>
+<!-- <h1 *ngIf="isTestEnded" class="large" style="text-align:center">
+  {{time}}
+</h1> -->
+
 <!-- <a *ngIf="isRuleChecked">{{ rule.name }}</a> -->
 <br />
 <div style="text-align: center;">

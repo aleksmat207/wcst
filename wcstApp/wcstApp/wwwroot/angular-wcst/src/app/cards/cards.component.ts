@@ -1,16 +1,16 @@
 import { Component, OnInit } from "@angular/core";
-import { SafeResourceUrl } from "../../../node_modules/@angular/platform-browser";
 import { CardsModel } from "../service/CardsService/cards.model";
 import { CardsService } from "../service/CardsService/cards.service";
 import { RuleService } from "../service/RuleService/rule.service";
 import { RuleModel } from "../service/RuleService/rule.model";
-import { timer } from "rxjs";
-import { timeInterval, pluck, take, windowWhen } from "rxjs/operators";
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
-import { formatDate } from "@angular/common";
+import { formatDate, DatePipe } from "@angular/common";
 import { ScoreModel } from "../service/CardsService/score.model";
+import * as jspdf from "jspdf";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
+import * as html2canvas from "html2canvas/dist/html2canvas.js";
+import * as rasterizeHTML from "rasterizehtml";
 @Component({
   selector: "app-cards",
   templateUrl: "./cards.component.html",
@@ -38,7 +38,7 @@ export class CardsComponent implements OnInit {
   ruleName: string;
   //scoring
   score: Array<ScoreModel> = [];
-  scoreModel: ScoreModel;
+  scoreModel: ScoreModel = <ScoreModel>{};
   startDate: string;
 
   trials: number;
@@ -114,9 +114,52 @@ export class CardsComponent implements OnInit {
   //   this.imagePaths.push(this.sanitizer.bypassSecurityTrustUrl('data:image/png;base64,' + card.imgbase));
   // });
   // }
+
   makePdf() {
-    let date = new Date();
+   
+      let date = new Date();
     this.startDate = formatDate(date, "shortDate", "pl");
+   
+    var pdf = new jspdf("p", "pt", "a4");
+   
+    // pdf.addFileToVFS("PTSans.ttf", Lato);
+    // pdf.addFont('PTSans.ttf', 'PTSans', 'normal');
+    // pdf.addFileToVFS('Font.ttf', font);
+    // pdf.addFont('Font.ttf', 'font', 'normal');
+    // pdf.setFont('font');
+
+    // pdf.text(20,20,"Test sortowania kard z Wisconsin ")
+    // pdf.text(20,40,"Data: " + this.startDate)
+    // pdf.text(20,60,"Czas trwania badania: " + this.time)
+    // pdf.text(20,80, "Ilość prób: " + this.trials)
+    // pdf.text(20,100,"Ilość odpowiedzi: " + this.responses)
+    // pdf.text(20,120, "Ilość błędów: " + this.errors)
+    // pdf.text(20,140,"Ilość błędów nieperseweracyjnych: " + this.nonPerservativeErrors)
+    // pdf.text(20,160, "Ilość odpowiedzi perseweracyjnych: " + this.perservativeResponses)
+    // pdf.text(20,180, "Procent odpowiedzi: " + this.percentageOfResponses)
+    // pdf.text(20,200,"Procent błędów perseweracyjnych: " +
+    // this.percentageOfPerservativeErrors.toFixed(2))
+    // pdf.text(20,220, "Ilość ukończonych kategorii: " + this.completedCategories)
+    // pdf.text(20,240,"Ilość błędów nieperseweracyjnych: " + this.nonPerservativeErrors)
+    // pdf.text(20,260, "Ilość prób do ukończenia pierwszej kategorii: " +
+    // this.trialsToFirstCategory)
+    // pdf.text(20,280, "Conceptual Level Response: " + this.conceptualLevelResponse)
+    // pdf.text(20,300,"Brak utrzymania zestawu: " + this.failureToSet)
+    pdf.internal.scaleFactor = 2.7;
+ 
+   
+    pdf.addHTML(
+      document.getElementById("exportthis"),
+      10,
+      15,
+      {
+        pagesplit: true,
+        margin: { top: 10, right: 10, bottom: 10, left: 10, useFor: "page" }
+      },
+      function() {
+        pdf.save("WCST_przebieg.pdf");
+      }
+    );
     var docDefinition = {
       content: [
         { text: "Test sortowania kard z Wisconsin ", fontSize: 22 },
@@ -127,7 +170,7 @@ export class CardsComponent implements OnInit {
         "Ilość prób: " + this.trials,
         "Ilość odpowiedzi: " + this.responses,
         "Ilość błędów: " + this.errors,
-        "Ilość błędów perseweracyjnych: " + this.perservativeErrors,
+        "Ilość błędów: " + this.errors,
         "Ilość błędów nieperseweracyjnych: " + this.nonPerservativeErrors,
         "Ilość odpowiedzi perseweracyjnych: " + this.perservativeResponses,
         "Procent odpowiedzi: " + this.percentageOfResponses,
@@ -141,7 +184,10 @@ export class CardsComponent implements OnInit {
       ]
     };
     pdfMake.createPdf(docDefinition).open();
-    pdfMake.createPdf(docDefinition).download("WCST");
+    pdfMake.createPdf(docDefinition).download("WCST_punktacja");
+  }
+  newTest() {
+    window.location.reload();
   }
   getDeck() {
     this.cardsService.getDeck().subscribe(r => {
@@ -155,7 +201,11 @@ export class CardsComponent implements OnInit {
     if (this.deck.length > 0) {
       this.card = this.deck.pop();
       this.temp++;
-      console.log("tslia", this.deck.length);
+      // //
+      // this.deck.pop();
+      // this.deck.pop();
+      // this.deck.pop();
+      console.log("talia", this.deck.length);
     } else {
       this.isTestEnded = true;
       this.pause = true;
@@ -170,10 +220,9 @@ export class CardsComponent implements OnInit {
     }
   }
   checkCard(element) {
-    console.log(element.imgbase);
-    console.log(this.scoreModel.selectedCard);
+    this.scoreModel = <ScoreModel>{};
     this.scoreModel.selectedCard = element.imgbase;
-    console.log(this.scoreModel.selectedCard);
+    this.scoreModel.comment = "";
     this.scoreModel.sortedCard = this.card.imgbase;
     switch (this.ruleName) {
       case "color":
@@ -182,8 +231,9 @@ export class CardsComponent implements OnInit {
           this.ruleCounter++;
           this.responses++;
           this.trials++;
-          console.log("DOBRZE! ruleCounter:", this.ruleCounter);
+          //  console.log("DOBRZE! ruleCounter:", this.ruleCounter);
           this.result = "Dobrze!";
+          this.scoreModel.appliedRule = "Kolor";
           this.calculateTrialsToFirstCategory();
           this.calculateConceptualLevelResponse();
         } else {
@@ -192,7 +242,7 @@ export class CardsComponent implements OnInit {
           this.ruleCounter = 0;
           this.series = 0;
           this.trials++;
-          console.log("ZLE! mistakeCounter:", this.errors);
+          //    console.log("ZLE! mistakeCounter:", this.errors);
           this.result = "Źle!";
           this.calculateTrialsToFirstCategory();
           if (
@@ -200,12 +250,15 @@ export class CardsComponent implements OnInit {
             element.number == this.card.number
           ) {
             this.perservativeResponses++;
-            console.log("pr: ", this.perservativeResponses);
+            this.scoreModel.comment += "odpowiedź perseweracyjna";
+            //   console.log("pr: ", this.perservativeResponses);
           }
           if (element.number == this.card.number) {
             this.previousErrorRule = "number";
-          } else {
+            this.scoreModel.appliedRule = "Liczba";
+          } else if (element.form == this.card.form) {
             this.previousErrorRule = "form";
+            this.scoreModel.appliedRule = "Kształt";
           }
           this.checkPerseveration(element);
         }
@@ -216,7 +269,8 @@ export class CardsComponent implements OnInit {
           this.ruleCounter++;
           this.responses++;
           this.trials++;
-          console.log("DOBRZE! ruleCounter:", this.ruleCounter);
+          this.scoreModel.appliedRule = "Kształt";
+          //  console.log("DOBRZE! ruleCounter:", this.ruleCounter);
           this.result = "Dobrze!";
           this.calculateTrialsToFirstCategory();
           this.calculateConceptualLevelResponse();
@@ -226,7 +280,7 @@ export class CardsComponent implements OnInit {
           this.ruleCounter = 0;
           this.series = 0;
           this.trials++;
-          console.log("ZLE! mistakeCounter:", this.errors);
+          //  console.log("ZLE! mistakeCounter:", this.errors);
           this.result = "Źle!";
           this.calculateTrialsToFirstCategory();
           if (
@@ -234,13 +288,17 @@ export class CardsComponent implements OnInit {
             element.color == this.card.color
           ) {
             this.perservativeResponses++;
-            console.log("pr: ", this.perservativeResponses);
+            this.scoreModel.comment += "odpowiedź perseweracyjna";
+            //   console.log("pr: ", this.perservativeResponses);
           }
           if (element.number == this.card.number) {
             this.previousErrorRule = "number";
-          } else {
+            this.scoreModel.appliedRule = "Liczba";
+          } else if (element.color == this.card.color) {
+            this.scoreModel.appliedRule = "Kolor";
             this.previousErrorRule = "color";
           }
+          this.checkPerseveration(element);
         }
         break;
       case "number":
@@ -249,7 +307,8 @@ export class CardsComponent implements OnInit {
           this.ruleCounter++;
           this.responses++;
           this.trials++;
-          console.log("DOBRZE! ruleCounter:", this.ruleCounter);
+          this.scoreModel.appliedRule = "Liczba";
+          //  console.log("DOBRZE! ruleCounter:", this.ruleCounter);
           this.calculateTrialsToFirstCategory();
           this.calculateConceptualLevelResponse();
           this.result = "Dobrze!";
@@ -259,18 +318,22 @@ export class CardsComponent implements OnInit {
           this.ruleCounter = 0;
           this.series = 0;
           this.trials++;
-          console.log("ZLE! mistakeCounter:", this.errors);
+          //console.log("ZLE! mistakeCounter:", this.errors);
           this.result = "Źle!";
           this.calculateTrialsToFirstCategory();
           if (this.completedCategories > 0 && element.form == this.card.form) {
             this.perservativeResponses++;
-            console.log("pr: ", this.perservativeResponses);
+            this.scoreModel.comment += "odpowiedź perseweracyjna";
+            //console.log("pr: ", this.perservativeResponses);
           }
           if (element.color == this.card.color) {
             this.previousErrorRule = "color";
-          } else {
+            this.scoreModel.appliedRule = "Kolor";
+          } else if (element.form == this.card.form) {
             this.previousErrorRule = "form";
+            this.scoreModel.appliedRule = "Kształ";
           }
+          this.checkPerseveration(element);
         }
         break;
     }
@@ -293,9 +356,10 @@ export class CardsComponent implements OnInit {
       }
       console.log("ZMIANA REGUŁY! ruleCounter:", this.ruleCounter);
       this.getRandomRule();
-
-      // this.score.push(this.scoreModel);
     }
+    console.log(this.scoreModel);
+    this.score.push(this.scoreModel);
+    console.log(this.score);
   }
   calculateTrialsToFirstCategory() {
     if (this.completedCategories < 1 && !this.isTestEnded) {
@@ -322,16 +386,19 @@ export class CardsComponent implements OnInit {
   checkPerseveration(element) {
     if (element.color == this.card.color && this.previousErrorRule == "color") {
       this.perservativeErrors = this.perservativeErrors + 1;
+      this.scoreModel.comment += "błąd perseweracyjny";
     } else if (
       element.number == this.card.number &&
       this.previousErrorRule == "number"
     ) {
       this.perservativeErrors = this.perservativeErrors + 1;
+      this.scoreModel.comment += "błąd perseweracyjny";
     } else if (
       element.form == this.card.form &&
       this.previousErrorRule == "form"
     ) {
       this.perservativeErrors = this.perservativeErrors + 1;
+      this.scoreModel.comment += "błąd perseweracyjny";
     } else {
       this.nonPerservativeErrors = this.nonPerservativeErrors + 1;
     }
