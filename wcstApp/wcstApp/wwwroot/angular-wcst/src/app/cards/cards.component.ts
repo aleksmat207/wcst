@@ -116,12 +116,11 @@ export class CardsComponent implements OnInit {
   // }
 
   makePdf() {
-   
-      let date = new Date();
-    this.startDate = formatDate(date, "shortDate", "pl");
-   
+    let date = new Date();
+    this.startDate = formatDate(date, "medium", "pl");
+
     var pdf = new jspdf("p", "pt", "a4");
-   
+
     // pdf.addFileToVFS("PTSans.ttf", Lato);
     // pdf.addFont('PTSans.ttf', 'PTSans', 'normal');
     // pdf.addFileToVFS('Font.ttf', font);
@@ -145,9 +144,11 @@ export class CardsComponent implements OnInit {
     // this.trialsToFirstCategory)
     // pdf.text(20,280, "Conceptual Level Response: " + this.conceptualLevelResponse)
     // pdf.text(20,300,"Brak utrzymania zestawu: " + this.failureToSet)
-    pdf.internal.scaleFactor = 2.7;
- 
-   
+    if (this.mobile) pdf.internal.scaleFactor = 1.7;
+    else if (!this.mobile && window.screen.width > 1400)
+      pdf.internal.scaleFactor = 3.2;
+    else pdf.internal.scaleFactor = 2.5;
+
     pdf.addHTML(
       document.getElementById("exportthis"),
       10,
@@ -162,29 +163,59 @@ export class CardsComponent implements OnInit {
     );
     var docDefinition = {
       content: [
-        { text: "Test sortowania kard z Wisconsin ", fontSize: 22 },
+        {
+          text: "Raport z testu sortowania kard z Wisconsin ",
+          style: "header"
+        },
         " ",
-        { text: "Data: " + this.startDate, fontSize: 22 },
         " ",
-        "Czas trwania badania: " + this.time,
-        "Ilość prób: " + this.trials,
-        "Ilość odpowiedzi: " + this.responses,
-        "Ilość błędów: " + this.errors,
-        "Ilość błędów: " + this.errors,
-        "Ilość błędów nieperseweracyjnych: " + this.nonPerservativeErrors,
-        "Ilość odpowiedzi perseweracyjnych: " + this.perservativeResponses,
-        "Procent odpowiedzi: " + this.percentageOfResponses,
-        "Procent błędów perseweracyjnych: " +
-          this.percentageOfPerservativeErrors.toFixed(2),
-        "Ilość ukończonych kategorii: " + this.completedCategories,
-        "Ilość prób do ukończenia pierwszej kategorii: " +
-          this.trialsToFirstCategory,
-        "Conceptual Level Response: " + this.conceptualLevelResponse,
-        "Brak utrzymania zestawu: " + this.failureToSet
-      ]
+        { text: "Data wykonania testu : " + this.startDate, fontSize: 20 },
+        " ",
+        " ",
+        " ",
+        {
+          layout: 'lightHorizontalLines',
+          table: {
+            body: [
+              ["Czas trwania badania ", this.time],
+              ["Liczba prób ", this.trials],
+              ["Liczba odpowiedzi ", this.responses],
+              ["Liczba błędów ", this.errors],
+              ["Liczba błędów perseweracyjnych ", this.perservativeErrors],
+              [
+                "Liczba błędów nieperseweracyjnych ",
+                this.nonPerservativeErrors
+              ],
+              [
+                "Liczba odpowiedzi perseweracyjnych ",
+                this.perservativeResponses
+              ],
+              ["Procent odpowiedzi ", this.percentageOfResponses.toFixed(2)],
+              [
+                "Procent błędów perseweracyjnych ",
+                this.percentageOfPerservativeErrors.toFixed(2)
+              ],
+              ["Liczba ukończonych kategorii ", this.completedCategories],
+              [
+                "Liczba prób do ukończenia pierwszej kategorii ",
+                this.trialsToFirstCategory
+              ],
+              ["Conceptual Level Response ", this.conceptualLevelResponse],
+              ["Brak utrzymania zestawu ", this.failureToSet]
+            ]
+          }
+        }
+      ],
+      styles: {
+        header: {
+          fontSize: 22,
+          bold: true,
+          alignment: "center"
+        }
+      }
     };
     pdfMake.createPdf(docDefinition).open();
-    pdfMake.createPdf(docDefinition).download("WCST_punktacja");
+    pdfMake.createPdf(docDefinition).download("WCST_wyniki");
   }
   newTest() {
     window.location.reload();
@@ -201,10 +232,10 @@ export class CardsComponent implements OnInit {
     if (this.deck.length > 0) {
       this.card = this.deck.pop();
       this.temp++;
-      // //
-      // this.deck.pop();
-      // this.deck.pop();
-      // this.deck.pop();
+      //
+      this.deck.pop();
+      this.deck.pop();
+      this.deck.pop();
       console.log("talia", this.deck.length);
     } else {
       this.isTestEnded = true;
@@ -250,7 +281,7 @@ export class CardsComponent implements OnInit {
             element.number == this.card.number
           ) {
             this.perservativeResponses++;
-            this.scoreModel.comment += "odpowiedź perseweracyjna";
+            this.scoreModel.comment += "odpowiedź perseweracyjna ";
             //   console.log("pr: ", this.perservativeResponses);
           }
           if (element.number == this.card.number) {
@@ -288,7 +319,7 @@ export class CardsComponent implements OnInit {
             element.color == this.card.color
           ) {
             this.perservativeResponses++;
-            this.scoreModel.comment += "odpowiedź perseweracyjna";
+            this.scoreModel.comment += "odpowiedź perseweracyjna ";
             //   console.log("pr: ", this.perservativeResponses);
           }
           if (element.number == this.card.number) {
@@ -323,7 +354,7 @@ export class CardsComponent implements OnInit {
           this.calculateTrialsToFirstCategory();
           if (this.completedCategories > 0 && element.form == this.card.form) {
             this.perservativeResponses++;
-            this.scoreModel.comment += "odpowiedź perseweracyjna";
+            this.scoreModel.comment += "odpowiedź perseweracyjna ";
             //console.log("pr: ", this.perservativeResponses);
           }
           if (element.color == this.card.color) {
@@ -386,25 +417,25 @@ export class CardsComponent implements OnInit {
   checkPerseveration(element) {
     if (element.color == this.card.color && this.previousErrorRule == "color") {
       this.perservativeErrors = this.perservativeErrors + 1;
-      this.scoreModel.comment += "błąd perseweracyjny";
+      this.scoreModel.comment += "błąd perseweracyjny ";
     } else if (
       element.number == this.card.number &&
       this.previousErrorRule == "number"
     ) {
       this.perservativeErrors = this.perservativeErrors + 1;
-      this.scoreModel.comment += "błąd perseweracyjny";
+      this.scoreModel.comment += "błąd perseweracyjny ";
     } else if (
       element.form == this.card.form &&
       this.previousErrorRule == "form"
     ) {
       this.perservativeErrors = this.perservativeErrors + 1;
-      this.scoreModel.comment += "błąd perseweracyjny";
+      this.scoreModel.comment += "błąd perseweracyjny ";
     } else {
       this.nonPerservativeErrors = this.nonPerservativeErrors + 1;
     }
   }
   makeScoring() {
-    this.percentageOfPerservativeErrors = this.perservativeErrors / this.errors;
+    this.percentageOfPerservativeErrors = this.perservativeErrors / this.trials;
     this.percentageOfPerservativeErrors.toFixed(2);
     this.percentageOfResponses = this.responses / this.trials;
     this.percentageOfResponses.toFixed(2);

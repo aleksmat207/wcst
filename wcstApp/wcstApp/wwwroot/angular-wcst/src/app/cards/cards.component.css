@@ -12,16 +12,16 @@
 .tableMobile {
     position: absolute;
     top:20%;
-    right: 12%;
+    right: calc(50% - 225px);
   background-color: #cccccc;
   border: 2px solid #7d7d7d;
-  width: 75%;
+  width: 450px;
 }
 .centerCardMobile {
   position: absolute;
   width: auto;
-  height: 100px;
-  top:65%;
+  height: 89px;
+top: 225px;
   left:  calc(50% - 32px);
   border-radius: 5px;
   border: 2px solid #7d7d7d;
@@ -37,7 +37,7 @@
   margin: 15px;
 }
 .largeMobile {
-  font-size: 35px;
+  font-size: 25px;
 }
 .mediumMobile {
   font-size: 10px;
@@ -46,8 +46,9 @@
   font-size: 20px;
 }
 .centerMobile {
-    left: 45%;
-    position: absolute;
+    position: absolute; 
+    top: 7%;
+    left:45%
 }
 
 
