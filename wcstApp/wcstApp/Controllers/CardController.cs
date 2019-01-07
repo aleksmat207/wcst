@@ -21,24 +21,24 @@ namespace wcstApp.Controllers
             _cardService = cardService;
         }
         [HttpGet, Route("start")]
-        public async Task <dynamic> GetStartingCards()
+        public dynamic GetStimulsCards()
         {
-            return await _cardService.GetStartingCards();
+            return _cardService.GetStimulsCards();
         }
         [HttpGet, Route("send")]
-        public async Task <IList<CardModel>> SendStartingCards()
+        public IList<CardModel> CreateStimulsCards()
         {
-            return await _cardService.SendStartingCards();
+            return _cardService.CreateStimulsCards();
         }
         [HttpGet, Route("sendrandom")]
-        public async Task<IList<CardModel>> SendRandomCard()
+        public IList<CardModel> CreateDeck()
         {
-            return await _cardService.SendRandomCard();
+            return _cardService.CreateDeck();
         }
         [HttpGet, Route("random")]
-        public async Task <dynamic> GetDeck()
+        public dynamic GetShuffledDeck()
         {
-            return await _cardService.GetDeck();
+            return _cardService.GetShuffledDeck();
         }
     }
 }

@@ -12,7 +12,7 @@ export class CardsService{
 
 constructor(private http: HttpClient) {}
 
-getStartingCards(): Observable<Array<CardsModel>>{
+getStimulsCards(): Observable<Array<CardsModel>>{
     return this.http.get<Array<CardsModel>>(`${environment.apiUrl}/card/start`);
 }
 // getRandomCard(): Observable<CardsModel>{

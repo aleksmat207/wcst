@@ -9,8 +9,7 @@ import { formatDate, DatePipe } from "@angular/common";
 import { ScoreModel } from "../service/CardsService/score.model";
 import * as jspdf from "jspdf";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
-import * as html2canvas from "html2canvas/dist/html2canvas.js";
-import * as rasterizeHTML from "rasterizehtml";
+import { LearningToLearnModel } from "../service/CardsService/learningToLearn.model";
 @Component({
   selector: "app-cards",
   templateUrl: "./cards.component.html",
@@ -23,7 +22,7 @@ export class CardsComponent implements OnInit {
   temp: number = 0;
   //   previousCard: CardsModel;
   //   imagePaths: Array<SafeResourceUrl> = [];
-  //  randomImagePath: SafeResourceUrl;
+  //  randomImagePath: SafeResourceUrl; 
   //  previousRule: RuleModel = { name };
   //  decodedCards: Array<string>;
   //  rule: RuleModel;
@@ -37,6 +36,9 @@ export class CardsComponent implements OnInit {
   mobile: boolean = false;
   ruleName: string;
   //scoring
+  ltlModel: LearningToLearnModel = <LearningToLearnModel>{};
+  arrayOfLTL: Array<LearningToLearnModel> = [];
+
   score: Array<ScoreModel> = [];
   scoreModel: ScoreModel = <ScoreModel>{};
   startDate: string;
@@ -50,13 +52,16 @@ export class CardsComponent implements OnInit {
   perservativeErrors: number;
   perservativeResponses: number;
   percentageOfResponses: number;
+  percentageOfPerservativeResponses: number;
+  percentageOfNonpeservativeErrors: number;
+  percentageOfCLR: number;
+  learningToLearn: number;
   percentageOfPerservativeErrors: number;
   failureToSet: number;
   trialsToFirstCategory: number;
   series: number;
-
   conceptualLevelResponse: number;
-  learningToLearn: number;
+  percentageOfErrors:number;
   //stopwatch:
 
   x: number;
@@ -75,12 +80,15 @@ export class CardsComponent implements OnInit {
   ngOnInit() {
     if (window.screen.width < 1024) {
       this.mobile = true;
-      window.screen.orientation.lock("portrait").catch(function(error) {
-        // whatever
-        console.log("mie mozna wyświetlić ");
-      });
+      // screen.orientation.lock("portrait").catch(function(error) {
+      //   console.log("mie mozna wyświetlić ");
+      //});
     }
-
+    this.percentageOfErrors=0;
+    this.percentageOfPerservativeResponses = 0;
+    this.percentageOfNonpeservativeErrors = 0;
+    this.percentageOfCLR = 0;
+    this.learningToLearn = 0;
     this.trials = 0;
     this.errors = 0;
     this.ruleCounter = 0;
@@ -97,8 +105,8 @@ export class CardsComponent implements OnInit {
     this.ruleName = "color";
     this.getDeck();
   }
-  getStartingCards() {
-    this.cardsService.getStartingCards().subscribe(r => {
+  getStimulsCards() {
+    this.cardsService.getStimulsCards().subscribe(r => {
       this.startingCards = r;
       this.isStarted = true;
       // console.log(this.startingCards)
@@ -152,10 +160,10 @@ export class CardsComponent implements OnInit {
     pdf.addHTML(
       document.getElementById("exportthis"),
       10,
-      15,
+      0,
       {
         pagesplit: true,
-        margin: { top: 10, right: 10, bottom: 10, left: 10, useFor: "page" }
+        margin: { top: 0, right: 10, bottom: 0, left: 10, useFor: "page" }
       },
       function() {
         pdf.save("WCST_przebieg.pdf");
@@ -174,11 +182,11 @@ export class CardsComponent implements OnInit {
         " ",
         " ",
         {
-          layout: 'lightHorizontalLines',
+          layout: "lightHorizontalLines",
           table: {
             body: [
               ["Czas trwania badania ", this.time],
-              ["Liczba prób ", this.trials],
+              ["Liczba przeprowadzonych prób ", this.trials],
               ["Liczba odpowiedzi ", this.responses],
               ["Liczba błędów ", this.errors],
               ["Liczba błędów perseweracyjnych ", this.perservativeErrors],
@@ -190,18 +198,33 @@ export class CardsComponent implements OnInit {
                 "Liczba odpowiedzi perseweracyjnych ",
                 this.perservativeResponses
               ],
-              ["Procent odpowiedzi ", this.percentageOfResponses.toFixed(2)],
+              [
+                "Procent błędów ",
+                this.percentageOfErrors.toFixed(2) + "%"
+              ],
               [
                 "Procent błędów perseweracyjnych ",
-                this.percentageOfPerservativeErrors.toFixed(2)
+                this.percentageOfPerservativeErrors.toFixed(2) + "%"
+              ],
+              [
+                "Procent odpowiedzi perseweracyjnych ",
+                this.percentageOfPerservativeResponses.toFixed(2) + "%"
+              ],
+              [
+                "Procent błędów nieperseweracyjnych ",
+                this.percentageOfNonpeservativeErrors.toFixed(2) + "%"
               ],
               ["Liczba ukończonych kategorii ", this.completedCategories],
               [
-                "Liczba prób do ukończenia pierwszej kategorii ",
+                "Próby przeprowadzone do momentu zaliczenia pierwszej kategorii ",
                 this.trialsToFirstCategory
               ],
-              ["Conceptual Level Response ", this.conceptualLevelResponse],
-              ["Brak utrzymania zestawu ", this.failureToSet]
+              ["Liczba odpowiedzi pojęciowych ", this.conceptualLevelResponse],
+              [
+                "Procent odpowiedzi pojęciowych ",
+                this.percentageOfCLR.toFixed(2) + "%"
+              ],
+              ["Liczba porażek w utrzymaniu nastawienia ", this.failureToSet]
             ]
           }
         }
@@ -233,9 +256,9 @@ export class CardsComponent implements OnInit {
       this.card = this.deck.pop();
       this.temp++;
       //
-      this.deck.pop();
-      this.deck.pop();
-      this.deck.pop();
+      // this.deck.pop();
+      // this.deck.pop();
+      // this.deck.pop();
       console.log("talia", this.deck.length);
     } else {
       this.isTestEnded = true;
@@ -246,6 +269,7 @@ export class CardsComponent implements OnInit {
       else this.time = this.minute + "m " + this.second + "s";
 
       console.log("KONIEC!!!!!!");
+      this.calculateLearningToLearn();
       this.calculateTrialsToFirstCategory();
       this.makeScoring();
     }
@@ -382,7 +406,7 @@ export class CardsComponent implements OnInit {
         if (this.hour > 0)
           this.time = this.hour + "h " + this.minute + "m " + this.second + "s";
         else this.time = this.minute + "m " + this.second + "s";
-
+        this.calculateLearningToLearn();
         this.makeScoring();
       }
       console.log("ZMIANA REGUŁY! ruleCounter:", this.ruleCounter);
@@ -403,6 +427,13 @@ export class CardsComponent implements OnInit {
   calculateFailureToSet() {
     if (this.ruleCounter > 4 && this.ruleCounter < 10) {
       this.failureToSet++;
+    }
+  }
+  calculateLearningToLearn() {
+    if (
+      this.completedCategories > 2 ||
+      (this.completedCategories == 2 && this.ruleCounter > 9)
+    ) {
     }
   }
   calculateConceptualLevelResponse() {
@@ -435,10 +466,18 @@ export class CardsComponent implements OnInit {
     }
   }
   makeScoring() {
-    this.percentageOfPerservativeErrors = this.perservativeErrors / this.trials;
+    this.percentageOfPerservativeErrors =
+      (this.perservativeErrors / this.trials) * 100;
     this.percentageOfPerservativeErrors.toFixed(2);
-    this.percentageOfResponses = this.responses / this.trials;
+    this.percentageOfResponses = (this.responses / this.trials) * 100;
     this.percentageOfResponses.toFixed(2);
+   this.percentageOfErrors=this.errors/this.trials*100;
+    this.percentageOfPerservativeResponses =
+      (this.perservativeResponses / this.trials) * 100;
+    this.percentageOfNonpeservativeErrors =
+      (this.nonPerservativeErrors / this.trials) * 100;
+    this.percentageOfCLR = (this.conceptualLevelResponse / this.trials) * 100;
+    this.learningToLearn = 0;
   }
   //   isCardRepeated() {
   //     if (JSON.stringify(this.card) === JSON.stringify(this.previousCard)) {

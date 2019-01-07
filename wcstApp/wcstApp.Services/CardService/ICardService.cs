@@ -9,9 +9,9 @@ namespace wcstApp.Services.CardService
 {
     public interface ICardService
     {
-        Task <dynamic> GetDeck();
-        Task <dynamic>  GetStartingCards();
-        Task <IList<CardModel>> SendStartingCards();
-        Task<IList<CardModel>> SendRandomCard();
+      dynamic GetShuffledDeck();
+      dynamic  GetStimulsCards();
+       IList<CardModel> CreateStimulsCards();
+       IList<CardModel> CreateDeck();
     }
 }
