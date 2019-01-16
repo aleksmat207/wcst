@@ -10,7 +10,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using wcstApp.Services.CardService;
-using wcstApp.Services.RuleService;
 
 namespace wcstApp
 {
@@ -30,7 +29,6 @@ namespace wcstApp
             //services.AddDbContext<DataContext>(options =>
             //  options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             services.AddScoped<ICardService, CardService>();
-            services.AddScoped<IRuleService, RuleService>();
             services.AddMvc();
         }
 

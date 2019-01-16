@@ -1,15 +1,12 @@
 import { Component, OnInit } from "@angular/core";
 import { CardsModel } from "../service/CardsService/cards.model";
 import { CardsService } from "../service/CardsService/cards.service";
-import { RuleService } from "../service/RuleService/rule.service";
-import { RuleModel } from "../service/RuleService/rule.model";
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 import { formatDate, DatePipe } from "@angular/common";
 import { ScoreModel } from "../service/CardsService/score.model";
 import * as jspdf from "jspdf";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
-import { LearningToLearnModel } from "../service/CardsService/learningToLearn.model";
 @Component({
   selector: "app-cards",
   templateUrl: "./cards.component.html",
@@ -20,13 +17,7 @@ export class CardsComponent implements OnInit {
   card: CardsModel;
   deck: Array<CardsModel> = [];
   temp: number = 0;
-  //   previousCard: CardsModel;
-  //   imagePaths: Array<SafeResourceUrl> = [];
-  //  randomImagePath: SafeResourceUrl; 
-  //  previousRule: RuleModel = { name };
-  //  decodedCards: Array<string>;
-  //  rule: RuleModel;
-
+  instruction: boolean;
   previousErrorRule: string;
   ruleCounter: number;
   result: string;
@@ -36,9 +27,6 @@ export class CardsComponent implements OnInit {
   mobile: boolean = false;
   ruleName: string;
   //scoring
-  ltlModel: LearningToLearnModel = <LearningToLearnModel>{};
-  arrayOfLTL: Array<LearningToLearnModel> = [];
-
   score: Array<ScoreModel> = [];
   scoreModel: ScoreModel = <ScoreModel>{};
   startDate: string;
@@ -61,7 +49,7 @@ export class CardsComponent implements OnInit {
   trialsToFirstCategory: number;
   series: number;
   conceptualLevelResponse: number;
-  percentageOfErrors:number;
+  percentageOfErrors: number;
   //stopwatch:
 
   x: number;
@@ -69,13 +57,10 @@ export class CardsComponent implements OnInit {
   hour = 0;
   minute = 0;
   second = 0;
-  millisecond = 0; // czy potrzebne??
+  millisecond = 0;
   pause = false;
 
-  constructor(
-    private cardsService: CardsService,
-    private ruleService: RuleService
-  ) {}
+  constructor(private cardsService: CardsService) {}
 
   ngOnInit() {
     if (window.screen.width < 1024) {
@@ -84,7 +69,8 @@ export class CardsComponent implements OnInit {
       //   console.log("mie mozna wyświetlić ");
       //});
     }
-    this.percentageOfErrors=0;
+    this.instruction = false;
+    this.percentageOfErrors = 0;
     this.percentageOfPerservativeResponses = 0;
     this.percentageOfNonpeservativeErrors = 0;
     this.percentageOfCLR = 0;
@@ -109,49 +95,20 @@ export class CardsComponent implements OnInit {
     this.cardsService.getStimulsCards().subscribe(r => {
       this.startingCards = r;
       this.isStarted = true;
-      // console.log(this.startingCards)
-      //  this.decode()
+      this.instruction = false;
       this.onStartStopwatch();
       let date = new Date();
       this.startDate = formatDate(date, "medium", "pl");
     });
   }
-  // decode(){
-  //     this.imagePaths=[]
-  //     this.startingCards.forEach(card => {
-  //   this.imagePaths.push(this.sanitizer.bypassSecurityTrustUrl('data:image/png;base64,' + card.imgbase));
-  // });
-  // }
+  showInstruction() {
+    this.instruction = true;
+  }
 
   makePdf() {
     let date = new Date();
     this.startDate = formatDate(date, "medium", "pl");
-
     var pdf = new jspdf("p", "pt", "a4");
-
-    // pdf.addFileToVFS("PTSans.ttf", Lato);
-    // pdf.addFont('PTSans.ttf', 'PTSans', 'normal');
-    // pdf.addFileToVFS('Font.ttf', font);
-    // pdf.addFont('Font.ttf', 'font', 'normal');
-    // pdf.setFont('font');
-
-    // pdf.text(20,20,"Test sortowania kard z Wisconsin ")
-    // pdf.text(20,40,"Data: " + this.startDate)
-    // pdf.text(20,60,"Czas trwania badania: " + this.time)
-    // pdf.text(20,80, "Ilość prób: " + this.trials)
-    // pdf.text(20,100,"Ilość odpowiedzi: " + this.responses)
-    // pdf.text(20,120, "Ilość błędów: " + this.errors)
-    // pdf.text(20,140,"Ilość błędów nieperseweracyjnych: " + this.nonPerservativeErrors)
-    // pdf.text(20,160, "Ilość odpowiedzi perseweracyjnych: " + this.perservativeResponses)
-    // pdf.text(20,180, "Procent odpowiedzi: " + this.percentageOfResponses)
-    // pdf.text(20,200,"Procent błędów perseweracyjnych: " +
-    // this.percentageOfPerservativeErrors.toFixed(2))
-    // pdf.text(20,220, "Ilość ukończonych kategorii: " + this.completedCategories)
-    // pdf.text(20,240,"Ilość błędów nieperseweracyjnych: " + this.nonPerservativeErrors)
-    // pdf.text(20,260, "Ilość prób do ukończenia pierwszej kategorii: " +
-    // this.trialsToFirstCategory)
-    // pdf.text(20,280, "Conceptual Level Response: " + this.conceptualLevelResponse)
-    // pdf.text(20,300,"Brak utrzymania zestawu: " + this.failureToSet)
     if (this.mobile) pdf.internal.scaleFactor = 1.7;
     else if (!this.mobile && window.screen.width > 1400)
       pdf.internal.scaleFactor = 3.2;
@@ -198,10 +155,7 @@ export class CardsComponent implements OnInit {
                 "Liczba odpowiedzi perseweracyjnych ",
                 this.perservativeResponses
               ],
-              [
-                "Procent błędów ",
-                this.percentageOfErrors.toFixed(2) + "%"
-              ],
+              ["Procent błędów ", this.percentageOfErrors.toFixed(2) + "%"],
               [
                 "Procent błędów perseweracyjnych ",
                 this.percentageOfPerservativeErrors.toFixed(2) + "%"
@@ -245,21 +199,13 @@ export class CardsComponent implements OnInit {
   }
   getDeck() {
     this.cardsService.getDeck().subscribe(r => {
-      // this.card=r;
       this.deck = r;
-      // this.isCardRepeated();
-      //this.randomImagePath=this.sanitizer.bypassSecurityTrustUrl('data:image/png;base64,' + r.imgbase);
     });
   }
   getRandomCard() {
     if (this.deck.length > 0) {
       this.card = this.deck.pop();
       this.temp++;
-      //
-      // this.deck.pop();
-      // this.deck.pop();
-      // this.deck.pop();
-      console.log("talia", this.deck.length);
     } else {
       this.isTestEnded = true;
       this.pause = true;
@@ -268,8 +214,6 @@ export class CardsComponent implements OnInit {
         this.time = this.hour + "h " + this.minute + "m " + this.second + "s";
       else this.time = this.minute + "m " + this.second + "s";
 
-      console.log("KONIEC!!!!!!");
-      this.calculateLearningToLearn();
       this.calculateTrialsToFirstCategory();
       this.makeScoring();
     }
@@ -286,9 +230,15 @@ export class CardsComponent implements OnInit {
           this.ruleCounter++;
           this.responses++;
           this.trials++;
-          //  console.log("DOBRZE! ruleCounter:", this.ruleCounter);
           this.result = "Dobrze!";
           this.scoreModel.appliedRule = "Kolor";
+          if (
+            this.completedCategories > 0 &&
+            element.number == this.card.number
+          ) {
+            this.perservativeResponses++;
+            this.scoreModel.comment += "odpowiedź perseweracyjna ";
+          }
           this.calculateTrialsToFirstCategory();
           this.calculateConceptualLevelResponse();
         } else {
@@ -297,16 +247,19 @@ export class CardsComponent implements OnInit {
           this.ruleCounter = 0;
           this.series = 0;
           this.trials++;
-          //    console.log("ZLE! mistakeCounter:", this.errors);
           this.result = "Źle!";
           this.calculateTrialsToFirstCategory();
           if (
             this.completedCategories > 0 &&
             element.number == this.card.number
           ) {
+            this.perservativeErrors++;
             this.perservativeResponses++;
-            this.scoreModel.comment += "odpowiedź perseweracyjna ";
-            //   console.log("pr: ", this.perservativeResponses);
+            this.scoreModel.comment +=
+              "błąd perseweracyjny, odpowiedź perseweracyjna ";
+          } else {
+            this.nonPerservativeErrors++;
+            this.scoreModel.comment += "błąd nieperseweracyjny ";
           }
           if (element.number == this.card.number) {
             this.previousErrorRule = "number";
@@ -315,7 +268,6 @@ export class CardsComponent implements OnInit {
             this.previousErrorRule = "form";
             this.scoreModel.appliedRule = "Kształt";
           }
-          this.checkPerseveration(element);
         }
         break;
       case "form":
@@ -325,8 +277,14 @@ export class CardsComponent implements OnInit {
           this.responses++;
           this.trials++;
           this.scoreModel.appliedRule = "Kształt";
-          //  console.log("DOBRZE! ruleCounter:", this.ruleCounter);
           this.result = "Dobrze!";
+          if (
+            this.completedCategories > 0 &&
+            element.color == this.card.color
+          ) {
+            this.perservativeResponses++;
+            this.scoreModel.comment += "odpowiedź perseweracyjna ";
+          }
           this.calculateTrialsToFirstCategory();
           this.calculateConceptualLevelResponse();
         } else {
@@ -335,16 +293,19 @@ export class CardsComponent implements OnInit {
           this.ruleCounter = 0;
           this.series = 0;
           this.trials++;
-          //  console.log("ZLE! mistakeCounter:", this.errors);
           this.result = "Źle!";
           this.calculateTrialsToFirstCategory();
           if (
             this.completedCategories > 0 &&
             element.color == this.card.color
           ) {
+            this.perservativeErrors++;
             this.perservativeResponses++;
-            this.scoreModel.comment += "odpowiedź perseweracyjna ";
-            //   console.log("pr: ", this.perservativeResponses);
+            this.scoreModel.comment +=
+              "błąd perseweracyjny, odpowiedź perseweracyjna ";
+          } else {
+            this.nonPerservativeErrors++;
+            this.scoreModel.comment += "błąd nieperseweracyjny ";
           }
           if (element.number == this.card.number) {
             this.previousErrorRule = "number";
@@ -353,7 +314,6 @@ export class CardsComponent implements OnInit {
             this.scoreModel.appliedRule = "Kolor";
             this.previousErrorRule = "color";
           }
-          this.checkPerseveration(element);
         }
         break;
       case "number":
@@ -363,7 +323,10 @@ export class CardsComponent implements OnInit {
           this.responses++;
           this.trials++;
           this.scoreModel.appliedRule = "Liczba";
-          //  console.log("DOBRZE! ruleCounter:", this.ruleCounter);
+          if (this.completedCategories > 0 && element.form == this.card.form) {
+            this.perservativeResponses++;
+            this.scoreModel.comment += "odpowiedź perseweracyjna ";
+          }
           this.calculateTrialsToFirstCategory();
           this.calculateConceptualLevelResponse();
           this.result = "Dobrze!";
@@ -373,13 +336,16 @@ export class CardsComponent implements OnInit {
           this.ruleCounter = 0;
           this.series = 0;
           this.trials++;
-          //console.log("ZLE! mistakeCounter:", this.errors);
           this.result = "Źle!";
           this.calculateTrialsToFirstCategory();
           if (this.completedCategories > 0 && element.form == this.card.form) {
             this.perservativeResponses++;
-            this.scoreModel.comment += "odpowiedź perseweracyjna ";
-            //console.log("pr: ", this.perservativeResponses);
+            this.perservativeErrors++;
+            this.scoreModel.comment +=
+              "błąd perseweracyjny, odpowiedź perseweracyjna ";
+          } else {
+            this.nonPerservativeErrors++;
+            this.scoreModel.comment += "błąd nieperseweracyjny ";
           }
           if (element.color == this.card.color) {
             this.previousErrorRule = "color";
@@ -388,7 +354,6 @@ export class CardsComponent implements OnInit {
             this.previousErrorRule = "form";
             this.scoreModel.appliedRule = "Kształ";
           }
-          this.checkPerseveration(element);
         }
         break;
     }
@@ -399,6 +364,7 @@ export class CardsComponent implements OnInit {
     if (this.ruleCounter == 10) {
       this.ruleCounter = 0;
       this.completedCategories++;
+      this.scoreModel.comment += "ukończono kategorię ";
       if (this.completedCategories == 6) {
         this.isTestEnded = true;
         this.pause = true;
@@ -406,15 +372,11 @@ export class CardsComponent implements OnInit {
         if (this.hour > 0)
           this.time = this.hour + "h " + this.minute + "m " + this.second + "s";
         else this.time = this.minute + "m " + this.second + "s";
-        this.calculateLearningToLearn();
         this.makeScoring();
       }
-      console.log("ZMIANA REGUŁY! ruleCounter:", this.ruleCounter);
-      this.getRandomRule();
+      this.getNextRule();
     }
-    console.log(this.scoreModel);
     this.score.push(this.scoreModel);
-    console.log(this.score);
   }
   calculateTrialsToFirstCategory() {
     if (this.completedCategories < 1 && !this.isTestEnded) {
@@ -427,13 +389,7 @@ export class CardsComponent implements OnInit {
   calculateFailureToSet() {
     if (this.ruleCounter > 4 && this.ruleCounter < 10) {
       this.failureToSet++;
-    }
-  }
-  calculateLearningToLearn() {
-    if (
-      this.completedCategories > 2 ||
-      (this.completedCategories == 2 && this.ruleCounter > 9)
-    ) {
+      this.scoreModel.comment += "porażka w utrzymaniu nastawienia ";
     }
   }
   calculateConceptualLevelResponse() {
@@ -443,7 +399,6 @@ export class CardsComponent implements OnInit {
     } else if (this.series > 3) {
       this.conceptualLevelResponse++;
     }
-    //ToDo
   }
   checkPerseveration(element) {
     if (element.color == this.card.color && this.previousErrorRule == "color") {
@@ -471,29 +426,14 @@ export class CardsComponent implements OnInit {
     this.percentageOfPerservativeErrors.toFixed(2);
     this.percentageOfResponses = (this.responses / this.trials) * 100;
     this.percentageOfResponses.toFixed(2);
-   this.percentageOfErrors=this.errors/this.trials*100;
+    this.percentageOfErrors = (this.errors / this.trials) * 100;
     this.percentageOfPerservativeResponses =
       (this.perservativeResponses / this.trials) * 100;
     this.percentageOfNonpeservativeErrors =
       (this.nonPerservativeErrors / this.trials) * 100;
     this.percentageOfCLR = (this.conceptualLevelResponse / this.trials) * 100;
-    this.learningToLearn = 0;
   }
-  //   isCardRepeated() {
-  //     if (JSON.stringify(this.card) === JSON.stringify(this.previousCard)) {
-  //       console.log("KARTY SIE POWTORZYLY!!!!");
-
-  //       this.getDeck();
-  //     } else {
-  //       this.previousCard = this.card;
-  //     }
-  //   }
-  getRandomRule() {
-    // this.ruleService.getRandomRule().subscribe(r => {
-    //   this.rule = r;
-    //   this.isRuleRepeated();
-    //   this.isRuleChecked = true;
-    // });
+  getNextRule() {
     switch (this.ruleName) {
       case "color":
         this.ruleName = "form";
@@ -506,17 +446,6 @@ export class CardsComponent implements OnInit {
         break;
     }
   }
-  //   isRuleRepeated() {
-  //     if (
-  //       JSON.stringify(this.rule).toLowerCase() ===
-  //       JSON.stringify(this.previousRule).toLowerCase()
-  //     ) {
-  //       this.getRandomRule();
-  //     } else {
-  //       this.previousRule = this.rule;
-  //     }
-  //   }
-  //stopwatch:
   onStartStopwatch() {
     this.x = 10;
     this.intervalId = setInterval(() => {

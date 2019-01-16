@@ -708,9 +708,6 @@ namespace wcstApp.Services.CardService
         }
         public dynamic GetShuffledDeck()
         {
-            //Random rand = new Random();
-            ////63
-            //int toSkip = rand.Next(0, 60);
             WebRequest wr = WebRequest.Create("http://localhost:59308/api/Card/sendrandom");
             WebResponse res = wr.GetResponse();
             dynamic images;
@@ -718,18 +715,15 @@ namespace wcstApp.Services.CardService
             {
                 string json = reader.ReadToEnd();
                 images = JsonConvert.DeserializeObject(json);
-                //  this.pictureBox1.Load(images["0"].imglink.Value);
             }
             Queue<object> randomizedList = new Queue<object>();
             Random rnd = new Random();
             while (images.Count > 0)
             {
-                int index = rnd.Next(0, images.Count); //pick a random item from the master list
-                randomizedList.Enqueue(images[index]); //place it at the end of the randomized list
+                int index = rnd.Next(0, images.Count);
+                randomizedList.Enqueue(images[index]);
                 images.RemoveAt(index);
             }
-
-            //  return images[toSkip];
             return randomizedList;
         }
       
